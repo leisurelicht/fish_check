@@ -30,7 +30,8 @@ class Bing_Search(object):
         self.keyWord = self.readConfig('fishconfig.ini','Bing-Search','KeyWord')
         self.searchTarget = self.searchUrl.replace('@',self.keyWord)
         self.header = header
-        self.header['Referer'] = 'http://www.baidu.com'
+        self.header['host'] = 'cn.bing.com'
+        self.header['Referer'] = 'http://cn.bing.com/'
 
     def readConfig(self,iniFile,section,option):
         '''
@@ -126,14 +127,15 @@ class Bing_Search(object):
                 sites = soup.find_all('h2')
                 for site in sites:
                     if site.a:
-                        print site.a.get_text()
-                        print site.a.get('href')
-                    #print site
-                #    title_url[site.a.strong.strong.get_text()] = site.a.get('href')
-                    #id_title_url[site['id']] = title_url.copy()
-                    #title_url.clear()
+                        #print site.a.get_text()
+                        #print site.a.get('href')
+                        #print site.a.get('h')
+                        title_url[site.a.get_text()] = site.a.get('href')
+                        id_title_url[site.a.get('h')] = title_url.copy()
+                        title_url.clear()
         #print title_url
-        #return  id_title_url
+        #print id_title_url
+        return  id_title_url
 
 if __name__=="__main__":
     bing = Bing_Search()
