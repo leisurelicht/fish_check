@@ -25,10 +25,10 @@ class Baidu_Search(object):
     def __init__(self,):
         super(Baidu_Search, self).__init__()
         self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
-        #self.baseUrl = 'http://www.baidu.com'
-        self.targetUrl = self.readConfig('fishconfig.ini','Baidu-Search','SiteUrl')
-        self.pageNum = int(self.readConfig('fishconfig.ini','Baidu-Search','pageNum'))
-        self.keyWord = self.readConfig('fishconfig.ini','Baidu-Search','KeyWord')
+        self.configFile = '../fishconfig.ini'
+        self.targetUrl = self.readConfig(self.configFile,'Baidu-Search','SiteUrl')
+        self.pageNum = int(self.readConfig(self.configFile,'Baidu-Search','pageNum'))
+        self.keyWord = self.readConfig(self.configFile,'Baidu-Search','KeyWord')
         self.searchTarget = self.searchUrl.replace('@',unicode(self.keyWord,"utf-8"))
         self.header = header
         self.header['Referer'] = 'http://www.baidu.com'
@@ -136,9 +136,9 @@ class Baidu_Search(object):
         '''
         '''
         print 'titleCompare'
-        if os.path.exists( './possiblesite.txt' ):
-            os.remove('./possiblesite.txt')
-        pen = open('./possiblesite.txt','a')
+        if os.path.exists( '../possiblesite.txt' ):
+            os.remove('../possiblesite.txt')
+        pen = open('../possiblesite.txt','a')
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
                 if title == self.keyWord:

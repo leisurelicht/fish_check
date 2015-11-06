@@ -25,9 +25,10 @@ class Bing_Search(object):
     def __init__(self,):
         super(Bing_Search, self).__init__()
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
-        self.targetUrl = self.readConfig('fishconfig.ini','Bing-Search','SiteUrl')
-        self.pageNum = int(self.readConfig('fishconfig.ini','Bing-Search','pageNum'))
-        self.keyWord = self.readConfig('fishconfig.ini','Bing-Search','KeyWord')
+        self.configFile = '../fishconfig.ini'
+        self.targetUrl = self.readConfig(self.configFile,'Bing-Search','SiteUrl')
+        self.pageNum = int(self.readConfig(self.configFile,'Bing-Search','pageNum'))
+        self.keyWord = self.readConfig(self.configFile,'Bing-Search','KeyWord')
         self.searchTarget = self.searchUrl.replace('@',self.keyWord)
         self.header = header
         self.header['host'] = 'cn.bing.com'
