@@ -136,9 +136,9 @@ class Baidu_Search(object):
         '''
         '''
         print 'titleCompare'
-        if os.path.exists( '../possiblesite.txt' ):
-            os.remove('../possiblesite.txt')
-        pen = open('../possiblesite.txt','a')
+        if os.path.exists( '../possiblesite_baidu.txt' ):
+            os.remove('../possiblesite_baidu.txt')
+        pen = open('../possiblesite_baidu.txt','a')
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
                 if title == self.keyWord:
