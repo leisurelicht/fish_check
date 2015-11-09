@@ -17,8 +17,7 @@ header = {
         'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0',
         'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language' : 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-        'Accept-Encoding' : 'gzip, deflate','DNT' : '1',
-        'Connection' : 'keep-alive'
+        'Accept-Encoding' : 'gzip, deflate',
         }
 
 class Bing_Search(object):
@@ -34,6 +33,7 @@ class Bing_Search(object):
         self.header = header
         #self.header['host'] = 'cn.bing.com'
         self.header['Referer'] = 'http://cn.bing.com/'
+
 
     def readConfig(self,iniFile,section,option):
         '''
@@ -62,42 +62,54 @@ class Bing_Search(object):
         '''
         '''
         print 'urlCheck'
-        url = urlparse.urlparse(url_str)
-        print url
+        url = urlparse.urlsplit(url_str)
         if url.netloc == '':
             return None
-        elif url.scheme == '':
-            url.scheme == 'http'
-        #return urlparse.urlunsplit(url) 
+        else:
+            if url.scheme == '':
+                url.scheme == 'http'
+                return urlparse.urlunsplit(url)
+            else:
+                return url_str
+
     def dataRequest(self,url):
         '''
         网页获取爬虫
         '''
         print 'dataRequest'
-        print url
         flag = self.sslJudge(url)
         print flag
+        count = 0
         while True:
             try:
 
-                page = requests.get( url , headers = self.header, timeout = 30 , verify = flag)
+                page = requests.get( url , headers = self.header, timeout = 10 , verify = flag )
             except requests.exceptions.ConnectionError:
                 print 'ConnectionError'
-                time.sleep(30)
-                continue
+                if flag == True:
+                    flag = False
+                    count += 1
+                    continue
+                if count > 2:
+                    return None
+                else:
+                    count += 1
+                    continue              
             except requests.exceptions.ConnectTimeout:
                 print 'ConnectTimeout'
-                time.sleep(60)
-                continue
+                if count > 2:
+                    return None
+                else:
+                    count +=1
+                    continue
             except requests.exceptions.SSLError:
                 print 'SSLError'
                 flag = False
-                #continue
-            except requests.exceptions.HTTPError as e:
-                print 'HTTPError'
-                time.sleep(600)
                 continue
-            except Exception as e:
+            except requests.exceptions.HTTPError:
+                print 'HTTPError'
+                return None
+            except requests.exceptions.RequestException as e:
                 errortext = "Error in function : \" %s \" ,\n \
                     Error name is : \" %s \" ,\n \
                     Error type is : \" %s \" ,\n \
@@ -132,7 +144,7 @@ class Bing_Search(object):
                      e,\
                      e.__class__.__doc__)
             print errortext
-            return NULL
+            return None
         else:
             return soup
 
@@ -141,40 +153,40 @@ class Bing_Search(object):
         获取页面
         '''
         print "pageGet"
-        urls = []
-        urls_2 = []
+        urls_search = []
+        urls_result = []
         for num in range(1,self.pageNum+1):
-            urls.append(self.searchTarget.replace('#',str((num-1)*10)))
-        for url in urls:
-            print url
-            try:
+            urls_search.append(self.searchTarget.replace('#',str((num-1)*10)))
+        for url in urls_search:
+            url  = self.urlCheck(url)
+            if url:
                 page = self.dataRequest(url)
-            except Exception as e:
-                errortext = "Error in function : \" %s \" ,\n \
-                    Error name is : \" %s \" ,\n \
-                    Error type is : \" %s \" ,\n \
-                    Error Message is : \" %s \" ,\n \
-                    Error doc is : \" %s \" \n" % \
-                    (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
-                     e.__class__.__doc__)
-                print errortext
+                if page:
+                    sites = page.find_all('h2')
+                    for site in sites:
+                        if site.a:
+                            #print site.a.get('href')
+                            urls_result.append(site.a.get('href').strip())
+                else:
+                    continue
             else:
-                sites = page.find_all('h2')
-                for site in sites:
-                    if site.a:
-                        #print site.a.get('href')
-                        urls_2.append(site.a.get('href'))
-        return urls_2
+                continue
+        return urls_result
 
     def titleGet(self,urls):
         '''
         '''
         print 'titleGet'
         for url in urls:
-            self.dataRequest(url)
+            print url
+            url  = self.urlCheck(url)
+            if url:
+                page = self.dataRequest(url)
+                if page:
+                    print page.title
+
+            else:
+                continue
 
 
 
@@ -208,8 +220,9 @@ class Bing_Search(object):
 
 if __name__=="__main__":
     bing = Bing_Search()
-    #urls = bing.pageGet()
-    #bing.titleGet(urls)
-    a  = bing.urlCheck('cn.bing.com/entities/search?q=%e4%b8%8a%e6%b5%b7%e9%93%b6%e8%a1%8c&filters=segment%3a%22local%22&pin=YN4067x7364153967624808703%2cYN4067x14496301%2cYN4067x16635168860261914832%2cYN4067x2545510891879138457%2cYN4067x23442530&FORM=LARE')
+    #a = bing.dataRequest('http://www.sbacn.org/')
+    #print a.title
+    urls = bing.pageGet()
+    bing.titleGet(urls)
     #a= bing.urlCheck('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
-    print a 
+    #print a 
