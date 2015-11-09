@@ -84,24 +84,35 @@ class Bing_Search(object):
             try:
 
                 page = requests.get( url , headers = self.header, timeout = 10 , verify = flag )
+                print page.url
             except requests.exceptions.ConnectionError:
                 print 'ConnectionError'
                 if flag == True:
                     flag = False
                     count += 1
                     continue
-                if count > 2:
+                if count > 1:
                     return None
                 else:
                     count += 1
-                    continue              
+                    continue
             except requests.exceptions.ConnectTimeout:
                 print 'ConnectTimeout'
-                if count > 2:
+                if count > 1:
                     return None
                 else:
-                    count +=1
+                    count += 1
                     continue
+            except requests.exceptions.ReadTimeout:
+                print 'ReadTimeout'
+                if count > 1:
+                    return None
+                else:
+                    count += 1
+                    continue
+            except requests.exceptions.TooManyRedirects:
+                print 'TooManyRedirects'
+                return None
             except requests.exceptions.SSLError:
                 print 'SSLError'
                 flag = False
@@ -225,4 +236,4 @@ if __name__=="__main__":
     urls = bing.pageGet()
     bing.titleGet(urls)
     #a= bing.urlCheck('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
-    #print a 
+    #print a
