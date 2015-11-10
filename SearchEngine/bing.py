@@ -96,6 +96,9 @@ class Bing_Search(object):
                 else:
                     count += 1
                     continue
+            except requests.exceptions.Timeout:#this is important
+                print 'Timeout'
+                return None
             except requests.exceptions.ConnectTimeout:
                 print 'ConnectTimeout'
                 if count > 1:
