@@ -25,7 +25,7 @@ class Baidu_Search(object):
     def __init__(self,):
         super(Baidu_Search, self).__init__()
         self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
-        self.configFile = '../fishconfig.ini'
+        self.configFile = 'fishconfig.ini'
         self.targetUrl = self.readConfig(self.configFile,'Baidu-Search','SiteUrl')
         self.pageNum = int(self.readConfig(self.configFile,'Baidu-Search','pageNum'))
         self.Search_KeyWord = self.readConfig(self.configFile,'Baidu-Search','Search_KeyWord')
@@ -137,9 +137,9 @@ class Baidu_Search(object):
         '''
         '''
         print 'titleCompare'
-        if os.path.exists( '../possiblesite_baidu.txt' ):
-            os.remove('../possiblesite_baidu.txt')
-        pen = open('../possiblesite_baidu.txt','a')
+        if os.path.exists( './Result/possiblesite_baidu.txt' ):
+            os.remove('./Result/possiblesite_baidu.txt')
+        pen = open('./Result/possiblesite_baidu.txt','a')
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
                 if title == self.Compare_KeyWord:
