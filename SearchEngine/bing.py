@@ -24,10 +24,11 @@ class Bing_Search(object):
     def __init__(self,):
         super(Bing_Search, self).__init__()
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
-        self.configFile = '../fishconfig.ini'
+        self.configFile = './fishconfig.ini'
         self.targetUrl = self.readConfig(self.configFile,'Bing-Search','SiteUrl')
         self.pageNum = int(self.readConfig(self.configFile,'Bing-Search','pageNum'))
         self.Search_KeyWord = self.readConfig(self.configFile,'Bing-Search','Search_KeyWord')
+        self.Compare_KeyWord = self.readConfig(self.configFile,'Bing-Search','Compare_KeyWord')
         self.searchTarget = self.searchUrl.replace('@',self.Search_KeyWord)
         self.header = header
         #self.header['host'] = 'cn.bing.com'
@@ -81,13 +82,11 @@ class Bing_Search(object):
         '''
         print 'dataRequest'
         flag = self.sslJudge(url)
-        print flag
         count = 0
         while True:
             try:
 
                 page = requests.get( url , headers = self.header, timeout = 10 , verify = flag )
-                print page.url
             except requests.exceptions.ConnectionError:
                 print 'ConnectionError'
                 if flag == True:
@@ -175,7 +174,8 @@ class Bing_Search(object):
         '''
         print "pageGet"
         urls_search = []
-        urls_result = []
+        result = {}
+        title_result = []
         for num in range(1,self.pageNum+1):
             urls_search.append(self.searchTarget.replace('#',str((num-1)*10)))
         for url in urls_search:
@@ -186,28 +186,31 @@ class Bing_Search(object):
                     sites = page.find_all('h2')
                     for site in sites:
                         if site.a:
-                            #print site.a.get('href')
-                            urls_result.append(site.a.get('href').strip())
+                            title_result.append(site.a.get_text().strip())
+                            result[site.a.get('href').strip()] = title_result[:]
+                            title_result.pop()
                 else:
                     continue
             else:
                 continue
-        return urls_result
+        return result
 
-    def titleGet(self,urls):
+    def titleGet(self,url_title):
         '''
+        获取url链接内的网站标题
+        返回格式为{url:[title1,title2],url:[title1,title2]}的数据
         '''
         print 'titleGet'
-        for url in urls:
+        for url,titles in url_title.iteritems():
             url  = self.urlCheck(url)
             if url:
                 page = self.dataRequest(url)
                 if page:
-                    print url
-                    print page.title
-
+                    titles.append(page.title.get_text())
             else:
                 continue
+        return url_title
+
 
 
 
@@ -216,27 +219,20 @@ class Bing_Search(object):
         '''
         '''
         print 'titleCompare'
-        if os.path.exists( '../possiblesite_bing.txt' ):
-            os.remove('../possiblesite_bing.txt')
-        pen = open('../possiblesite_bing.txt','a')
-        for titleANDurl in total_titleANDurl:
-            for title,url in titleANDurl.iteritems():
-                print title
-                if title == self.Search_KeyWord:
-                    pen.write('title:'+title+'\n')
-                    pen.write('url:'+url+'\n')
-                    pen.write('***********'+'\n')
-                    pen.flush()
-                    #if self.pageCompare(self.targetUrl,url):
-                    #    print '开始记录可能的钓鱼网站'
-                    #    pen.write('title:'+title)
-                    #    pen.write('url:'+url)
-                    #    pen.write('***********')
-                    #    pen.flush()
-                    #else:
-                    #    print '检查下一个网站'
-                else:
-                    continue
+        if os.path.exists( './Result/possiblesite_bing.txt' ):
+            os.remove('./Result/possiblesite_bing.txt')
+        pen = open('./Result/possiblesite_bing.txt','a')
+        print total_titleANDurl
+        for url,titles in total_titleANDurl.iteritems():
+            print 'url',url
+            print 'titles[0]',titles[0]
+            print 'titles[-1]',titles[-1]
+            if self.Compare_KeyWord == titles[0] or self.Compare_KeyWord == titles[-1]:
+                pen.write('url:'+url+'\n')
+                pen.write('***********'+'\n')
+                pen.flush()
+            else:
+                continue
         pen.close()
 
 if __name__=="__main__":
@@ -244,6 +240,8 @@ if __name__=="__main__":
     #a = bing.dataRequest('http://www.sbacn.org/')
     #print a.title
     urls = bing.pageGet()
-    bing.titleGet(urls)
+    titles=bing.titleGet(urls)
+    bing.titleCompare(titles)
+
     #a= bing.urlCheck('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     #print a
