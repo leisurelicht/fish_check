@@ -28,8 +28,9 @@ class Baidu_Search(object):
         self.configFile = '../fishconfig.ini'
         self.targetUrl = self.readConfig(self.configFile,'Baidu-Search','SiteUrl')
         self.pageNum = int(self.readConfig(self.configFile,'Baidu-Search','pageNum'))
-        self.keyWord = self.readConfig(self.configFile,'Baidu-Search','KeyWord')
-        self.searchTarget = self.searchUrl.replace('@',unicode(self.keyWord,"utf-8"))
+        self.Search_KeyWord = self.readConfig(self.configFile,'Baidu-Search','Search_KeyWord')
+        self.Compare_KeyWord = self.readConfig(self.configFile,'Baidu-Search','Compare_KeyWord')
+        self.searchTarget = self.searchUrl.replace('@',unicode(self.Search_KeyWord,"utf-8"))
         self.header = header
         self.header['Referer'] = 'http://www.baidu.com'
 
@@ -141,7 +142,7 @@ class Baidu_Search(object):
         pen = open('../possiblesite_baidu.txt','a')
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
-                if title == self.keyWord:
+                if title == self.Compare_KeyWord:
                     pen.write('title:'+title+'\n')
                     pen.write('url:'+url+'\n')
                     pen.write('***********'+'\n')

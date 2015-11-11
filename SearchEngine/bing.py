@@ -3,7 +3,6 @@
 import re
 import os
 import sys
-import time
 import requests
 import urlparse
 from ConfigParser import ConfigParser
@@ -28,8 +27,8 @@ class Bing_Search(object):
         self.configFile = '../fishconfig.ini'
         self.targetUrl = self.readConfig(self.configFile,'Bing-Search','SiteUrl')
         self.pageNum = int(self.readConfig(self.configFile,'Bing-Search','pageNum'))
-        self.keyWord = self.readConfig(self.configFile,'Bing-Search','KeyWord')
-        self.searchTarget = self.searchUrl.replace('@',self.keyWord)
+        self.Search_KeyWord = self.readConfig(self.configFile,'Bing-Search','Search_KeyWord')
+        self.searchTarget = self.searchUrl.replace('@',self.Search_KeyWord)
         self.header = header
         #self.header['host'] = 'cn.bing.com'
         self.header['Referer'] = 'http://cn.bing.com/'
@@ -50,6 +49,7 @@ class Bing_Search(object):
 
     def sslJudge(self,url_str):
         '''
+        判断url是https还是http连接
         '''
         print 'sslJudge'
         url = urlparse.urlparse(url_str)
@@ -60,6 +60,7 @@ class Bing_Search(object):
 
     def urlCheck(self,url_str):
         '''
+        检查url是否完整
         '''
         print 'urlCheck'
         url = urlparse.urlsplit(url_str)
@@ -74,7 +75,9 @@ class Bing_Search(object):
 
     def dataRequest(self,url):
         '''
-        网页获取爬虫
+        获取网页后用BeautifulSoup处理
+        返回beautifulsoup格式的对象
+        出错返回一个None
         '''
         print 'dataRequest'
         flag = self.sslJudge(url)
@@ -135,7 +138,7 @@ class Bing_Search(object):
                      e,\
                      e.__class__.__doc__)
                 print errortext
-                continue
+                return None
             else:
                 if page.status_code == 200:
                     html = page.content #get page content
@@ -143,7 +146,11 @@ class Bing_Search(object):
                 else:
                     errortext = "Page Code %s " % page.status_code
                     print errortext
-                    continue
+                    if count > 1:
+                        return None
+                    else:
+                        count += 1
+                        continue
         try:
             soup = BeautifulSoup(html)
         except Exception as e:
@@ -192,11 +199,11 @@ class Bing_Search(object):
         '''
         print 'titleGet'
         for url in urls:
-            print url
             url  = self.urlCheck(url)
             if url:
                 page = self.dataRequest(url)
                 if page:
+                    print url
                     print page.title
 
             else:
@@ -215,7 +222,7 @@ class Bing_Search(object):
         for titleANDurl in total_titleANDurl:
             for title,url in titleANDurl.iteritems():
                 print title
-                if title == self.keyWord:
+                if title == self.Search_KeyWord:
                     pen.write('title:'+title+'\n')
                     pen.write('url:'+url+'\n')
                     pen.write('***********'+'\n')
