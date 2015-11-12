@@ -80,9 +80,6 @@ class Bing_Search(object):
         pen = open('./Result/possiblesite_bing.txt','a')
         print total_titleANDurl
         for url,titles in total_titleANDurl.iteritems():
-            print 'url',url
-            print 'titles[0]',titles[0]
-            print 'titles[-1]',titles[-1]
             if self.Compare_KeyWord == titles[0] or self.Compare_KeyWord == titles[-1]:
                 pen.write('url:'+url+'\n')
                 pen.write('***********'+'\n')
