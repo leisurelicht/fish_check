@@ -4,100 +4,32 @@ import re
 import os
 import sys
 import time
-import requests
-from ConfigParser import ConfigParser
-from bs4 import BeautifulSoup
+from Common import config
+from Common import function as fun
+from Common import network as net
 
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-header = {
-        'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0',
-        'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language' : 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-        'Accept-Encoding' : 'gzip, deflate','DNT' : '1',
-        'Connection' : 'keep-alive'
-        }
 
 class Baidu_Search(object):
     """docstring for Baidu_Search"""
     def __init__(self,):
         super(Baidu_Search, self).__init__()
-        self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
+
         self.configFile = 'fishconfig.ini'
-        self.targetUrl = self.readConfig(self.configFile,'Baidu-Search','SiteUrl')
-        self.pageNum = int(self.readConfig(self.configFile,'Baidu-Search','pageNum'))
-        self.Search_KeyWord = self.readConfig(self.configFile,'Baidu-Search','Search_KeyWord')
-        self.Compare_KeyWord = self.readConfig(self.configFile,'Baidu-Search','Compare_KeyWord')
+        self.targetUrl = fun.readConfig(self.configFile,'Baidu-Search','SiteUrl')
+        self.pageNum = int(fun.readConfig(self.configFile,'Baidu-Search','pageNum'))
+        self.Search_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Search_KeyWord')
+        self.Compare_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Compare_KeyWord')
+
+        self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
         self.searchTarget = self.searchUrl.replace('@',unicode(self.Search_KeyWord,"utf-8"))
-        self.header = header
+
+        self.header = config.header
         self.header['Referer'] = 'http://www.baidu.com'
 
-    def readConfig(self,iniFile,section,option):
-        '''
-        读取配置文件
-        '''
-        print 'readConfig'
-        try:
-            config = ConfigParser()
-            config.read(iniFile)
-        except Exception:
-            print "无法读取配置文件"
-        else:
-            return config.get(section,option)
-
-
-    def dataRequest(self,url):
-        '''
-        网页获取爬虫
-        '''
-        print 'dataRequest'
-        while True:
-            try:
-                page = requests.get( url , headers = self.header, timeout = 30 )
-            except requests.exceptions.ConnectionError:
-                    time.sleep(30)
-                    continue
-            except requests.exceptions.ConnectTimeout:
-                    time.sleep(60)
-                    continue
-            except requests.exceptions.HTTPError as e:
-                    errortext = "Error in function : \" %s \" ,\n \
-                    Error name is : \" %s \" ,\n \
-                    Error type is : \" %s \" ,\n \
-                    Error Message is : \" %s \" ,\n \
-                    Error doc is : \" %s \" \n" % \
-                    (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
-                     e.__class__.__doc__)
-                    print errortext
-                    time.sleep(600)
-                    continue
-            except Exception as e:
-                    errortext = "Error in function : \" %s \" ,\n \
-                    Error name is : \" %s \" ,\n \
-                    Error type is : \" %s \" ,\n \
-                    Error Message is : \" %s \" ,\n \
-                    Error doc is : \" %s \" \n" % \
-                    (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
-                     e.__class__.__doc__)
-                    print errortext
-                    continue
-            else:
-                if page.status_code == 200:
-                    html = page.content #get page content
-                    break
-                else:
-                    errortext = "Page Code %s " % page.status_code
-                    print errortext
-                    continue
-        return html
 
     def pageGet(self):
         '''
@@ -110,27 +42,12 @@ class Baidu_Search(object):
         for num in range(1,self.pageNum+1):
             urls.append(self.searchTarget.replace('#',str((num-1)*10)))
         for url in urls:
-            try:
-                page = self.dataRequest(url)
-                soup = BeautifulSoup(page)
-            except Exception as e:
-                errortext = "Error in function : \" %s \" ,\n \
-                    Error name is : \" %s \" ,\n \
-                    Error type is : \" %s \" ,\n \
-                    Error Message is : \" %s \" ,\n \
-                    Error doc is : \" %s \" \n" % \
-                    (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
-                     e.__class__.__doc__)
-                print errortext
-            else:
-                sites = soup.find_all('div',id = re.compile("^\d+$"))
-                for site in sites:
-                    title_url[site.h3.a.get_text()] = site.h3.a.get('href')
-                    id_title_url[site['id']] = title_url.copy()
-                    title_url.clear()
+            page = net.dataRequest(url,self.header)
+            sites = page.find_all('div',id = re.compile("^\d+$"))
+            for site in sites:
+                title_url[site.h3.a.get_text()] = site.h3.a.get('href')
+                id_title_url[site['id']] = title_url.copy()
+                title_url.clear()
         return  id_title_url
 
     def titleCompare(self,id_titleANDurl):

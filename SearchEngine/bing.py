@@ -1,172 +1,32 @@
 #! /usr/bin/env python
 #-*- coding=utf-8 -*-
-import re
 import os
 import sys
-import requests
-import urlparse
-from ConfigParser import ConfigParser
-from bs4 import BeautifulSoup
+from Common import config
+from Common import function as fun
+from Common import network as net
 
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-header = {
-        'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:40.0) Gecko/20100101 Firefox/40.0',
-        'Accept' : 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language' : 'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-        'Accept-Encoding' : 'gzip, deflate',
-        }
-
 class Bing_Search(object):
     """docstring for Bing_Search"""
     def __init__(self,):
         super(Bing_Search, self).__init__()
-        self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
+
         self.configFile = './fishconfig.ini'
-        self.targetUrl = self.readConfig(self.configFile,'Bing-Search','SiteUrl')
-        self.pageNum = int(self.readConfig(self.configFile,'Bing-Search','pageNum'))
-        self.Search_KeyWord = self.readConfig(self.configFile,'Bing-Search','Search_KeyWord')
-        self.Compare_KeyWord = self.readConfig(self.configFile,'Bing-Search','Compare_KeyWord')
+        self.targetUrl = fun.readConfig(self.configFile,'Bing-Search','SiteUrl')
+        self.pageNum = int(fun.readConfig(self.configFile,'Bing-Search','pageNum'))
+        self.Search_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Search_KeyWord')
+        self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_KeyWord')
+
+        self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
         self.searchTarget = self.searchUrl.replace('@',self.Search_KeyWord)
-        self.header = header
-        #self.header['host'] = 'cn.bing.com'
+
+        self.header = config.header
         self.header['Referer'] = 'http://cn.bing.com/'
-
-
-    def readConfig(self,iniFile,section,option):
-        '''
-        读取配置文件
-        '''
-        print 'readConfig'
-        try:
-            config = ConfigParser()
-            config.read(iniFile)
-        except Exception:
-            print "无法读取配置文件"
-        else:
-            return config.get(section,option)
-
-    def sslJudge(self,url_str):
-        '''
-        判断url是https还是http连接
-        '''
-        print 'sslJudge'
-        url = urlparse.urlparse(url_str)
-        if url.scheme == 'https':
-            return True
-        else:
-            return False
-
-    def urlCheck(self,url_str):
-        '''
-        检查url是否完整
-        '''
-        print 'urlCheck'
-        url = urlparse.urlsplit(url_str)
-        if url.netloc == '':
-            return None
-        else:
-            if url.scheme == '':
-                url.scheme == 'http'
-                return urlparse.urlunsplit(url)
-            else:
-                return url_str
-
-    def dataRequest(self,url):
-        '''
-        获取网页后用BeautifulSoup处理
-        返回beautifulsoup格式的对象
-        出错返回一个None
-        '''
-        print 'dataRequest'
-        flag = self.sslJudge(url)
-        count = 0
-        while True:
-            try:
-
-                page = requests.get( url , headers = self.header, timeout = 10 , verify = flag )
-            except requests.exceptions.ConnectionError:
-                print 'ConnectionError'
-                if flag == True:
-                    flag = False
-                    count += 1
-                    continue
-                if count > 1:
-                    return None
-                else:
-                    count += 1
-                    continue
-            except requests.exceptions.Timeout:#this is important
-                print 'Timeout'
-                return None
-            except requests.exceptions.ConnectTimeout:
-                print 'ConnectTimeout'
-                if count > 1:
-                    return None
-                else:
-                    count += 1
-                    continue
-            except requests.exceptions.ReadTimeout:
-                print 'ReadTimeout'
-                if count > 1:
-                    return None
-                else:
-                    count += 1
-                    continue
-            except requests.exceptions.TooManyRedirects:
-                print 'TooManyRedirects'
-                return None
-            except requests.exceptions.SSLError:
-                print 'SSLError'
-                flag = False
-                continue
-            except requests.exceptions.HTTPError:
-                print 'HTTPError'
-                return None
-            except requests.exceptions.RequestException as e:
-                errortext = "Error in function : \" %s \" ,\n \
-                    Error name is : \" %s \" ,\n \
-                    Error type is : \" %s \" ,\n \
-                    Error Message is : \" %s \" ,\n \
-                    Error doc is : \" %s \" \n" % \
-                (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
-                     e.__class__.__doc__)
-                print errortext
-                return None
-            else:
-                if page.status_code == 200:
-                    html = page.content #get page content
-                    break
-                else:
-                    errortext = "Page Code %s " % page.status_code
-                    print errortext
-                    if count > 1:
-                        return None
-                    else:
-                        count += 1
-                        continue
-        try:
-            soup = BeautifulSoup(html)
-        except Exception as e:
-            errortext = "Error in function : \" %s \" ,\n \
-                    Error name is : \" %s \" ,\n \
-                    Error type is : \" %s \" ,\n \
-                    Error Message is : \" %s \" ,\n \
-                    Error doc is : \" %s \" \n" % \
-                    (sys._getframe().f_code.co_name,\
-                     e.__class__.__name__,\
-                     e.__class__,\
-                     e,\
-                     e.__class__.__doc__)
-            print errortext
-            return None
-        else:
-            return soup
+        #self.header['host'] = 'cn.bing.com'
 
     def pageGet(self):
         '''
@@ -179,9 +39,9 @@ class Bing_Search(object):
         for num in range(1,self.pageNum+1):
             urls_search.append(self.searchTarget.replace('#',str((num-1)*10)))
         for url in urls_search:
-            url  = self.urlCheck(url)
+            url  = fun.urlCheck(url)
             if url:
-                page = self.dataRequest(url)
+                page = net.dataRequest(url,self.header)
                 if page:
                     sites = page.find_all('h2')
                     for site in sites:
@@ -202,18 +62,14 @@ class Bing_Search(object):
         '''
         print 'titleGet'
         for url,titles in url_title.iteritems():
-            url  = self.urlCheck(url)
+            url  = fun.urlCheck(url)
             if url:
-                page = self.dataRequest(url)
+                page = net.dataRequest(url,self.header)
                 if page:
                     titles.append(page.title.get_text())
             else:
                 continue
         return url_title
-
-
-
-
 
     def titleCompare(self,total_titleANDurl):
         '''
