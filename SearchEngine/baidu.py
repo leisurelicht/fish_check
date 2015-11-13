@@ -34,6 +34,7 @@ class Baidu_Search(object):
     def pageGet(self):
         '''
         获取页面
+        返回格式为{id:{title:url},}的数据
         '''
         print "pageGet"
         urls = []
@@ -49,6 +50,20 @@ class Baidu_Search(object):
                 id_title_url[site['id']] = title_url.copy()
                 title_url.clear()
         return  id_title_url
+
+    def titleGet(self,id_titleANDurl):
+        '''
+        '''
+        for _id,titleANDurl in id_titleANDurl.iteritems():
+            for title,url in titleANDurl.iteritems():
+                page = net.Request(url,self.header)
+                print 'baidu:',url
+                if page:
+                    print 'moto:',page.url
+                else:
+                    print 'None'
+                print '*'*5
+
 
     def titleCompare(self,id_titleANDurl):
         '''
@@ -117,6 +132,7 @@ class Baidu_Search(object):
 
 if __name__=="__main__":
     baidu = Baidu_Search()
-    baidu.titleCompare(baidu.pageGet())
+    baidu.pageGet()
+    #baidu.titleCompare(baidu.pageGet())
     #baidu.pageCompare()
 
