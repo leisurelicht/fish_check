@@ -106,37 +106,37 @@ def dataRequest(url,header):
                 count += 1
                 continue
             if count > 1:
-                return None
+                return (None,None)
             else:
                 count += 1
                 continue
         except requests.exceptions.Timeout:#this is important
             print 'Timeout'
-            return None
+            return (None,None)
         except requests.exceptions.ConnectTimeout:
             print 'ConnectTimeout'
             if count > 1:
-                return None
+                return (None,None)
             else:
                 count += 1
                 continue
         except requests.exceptions.ReadTimeout:
             print 'ReadTimeout'
             if count > 1:
-                return None
+                return (None,None)
             else:
                 count += 1
                 continue
         except requests.exceptions.TooManyRedirects:
             print 'TooManyRedirects'
-            return None
+            return (None,None)
         except requests.exceptions.SSLError:
             print 'SSLError'
             flag = False
             continue
         except requests.exceptions.HTTPError:
             print 'HTTPError'
-            return None
+            return (None,None)
         except requests.exceptions.RequestException as e:
             errortext = "Error in function : \" %s \" ,\n \
                 Error name is : \" %s \" ,\n \
@@ -149,7 +149,7 @@ def dataRequest(url,header):
                  e,\
                  e.__class__.__doc__)
             print errortext
-            return None
+            return (None,None)
         else:
             if page.status_code == 200:
                 html = page.content #get page content
@@ -158,7 +158,7 @@ def dataRequest(url,header):
                 errortext = "Page Code %s " % page.status_code
                 print errortext
                 if count > 1:
-                    return None
+                    return (page,None)
                 else:
                     count += 1
                     continue
@@ -176,6 +176,6 @@ def dataRequest(url,header):
                  e,\
                  e.__class__.__doc__)
         print errortext
-        return None
+        return (page,None)
     else:
-        return soup
+        return (page,soup)
