@@ -41,7 +41,7 @@ class Bing_Search(object):
         for url in urls_search:
             url  = fun.urlCheck(url)
             if url:
-                page = net.dataRequest(url,self.header)
+                connect , page = net.dataRequest(url,self.header)
                 if page:
                     sites = page.find_all('h2')
                     for site in sites:
@@ -64,7 +64,7 @@ class Bing_Search(object):
         for url,titles in url_title.iteritems():
             url  = fun.urlCheck(url)
             if url:
-                page = net.dataRequest(url,self.header)
+                connect , page = net.dataRequest(url,self.header)
                 if page:
                     titles.append(page.title.get_text())
             else:
@@ -78,7 +78,6 @@ class Bing_Search(object):
         if os.path.exists( './Result/possiblesite_bing.txt' ):
             os.remove('./Result/possiblesite_bing.txt')
         pen = open('./Result/possiblesite_bing.txt','a')
-        print total_titleANDurl
         for url,titles in total_titleANDurl.iteritems():
             if self.Compare_KeyWord == titles[0] or self.Compare_KeyWord == titles[-1]:
                 pen.write('url:'+url+'\n')

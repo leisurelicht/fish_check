@@ -3,7 +3,6 @@
 import re
 import os
 import sys
-import time
 from Common import config
 from Common import function as fun
 from Common import network as net
@@ -43,7 +42,7 @@ class Baidu_Search(object):
         for num in range(1,self.pageNum+1):
             urls.append(self.searchTarget.replace('#',str((num-1)*10)))
         for url in urls:
-            page = net.dataRequest(url,self.header)
+            connect , page = net.dataRequest(url,self.header)
             sites = page.find_all('div',id = re.compile("^\d+$"))
             for site in sites:
                 title_url[site.h3.a.get_text()] = site.h3.a.get('href')
@@ -56,10 +55,10 @@ class Baidu_Search(object):
         '''
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
-                page = net.Request(url,self.header)
+                connect , page = net.dataRequest(url,self.header)
                 print 'baidu:',url
-                if page:
-                    print 'moto:',page.url
+                if connect:
+                    print 'moto:',connect.url
                 else:
                     print 'None'
                 print '*'*5
