@@ -21,7 +21,7 @@ class Baidu_Search(object):
         self.targetUrl = fun.readConfig(self.configFile,'Baidu-Search','SiteUrl')
         self.pageNum = int(fun.readConfig(self.configFile,'Baidu-Search','pageNum'))
         self.Search_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Search_KeyWord')
-        self.Compare_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Compare_KeyWord')
+        self.Compare_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Compare_Title')
 
         self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
         self.searchTarget = self.searchUrl.replace('@',unicode(self.Search_KeyWord,"utf-8"))

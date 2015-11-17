@@ -19,7 +19,7 @@ class Bing_Search(object):
         self.targetUrl = fun.readConfig(self.configFile,'Bing-Search','SiteUrl')
         self.pageNum = int(fun.readConfig(self.configFile,'Bing-Search','pageNum'))
         self.Search_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Search_KeyWord')
-        self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_KeyWord')
+        self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_Title')
 
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
         self.searchTarget = self.searchUrl.replace('@',self.Search_KeyWord)

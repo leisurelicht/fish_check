@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from . import function as fun
 
 
-#页面读取函数
+#页面读取函数,その１
 def Request(url,header):
     '''
     获取网页后不处理
@@ -86,12 +86,11 @@ def Request(url,header):
                     continue
 
 
-#页面读取函数
+#页面读取函数、その２
 def dataRequest(url,header):
     '''
     获取网页后用BeautifulSoup处理
-    返回beautifulsoup格式的对象
-    出错返回一个None
+    返回一个元组(request格式的对象,beautifulsoup格式的对象)
     '''
     print 'dataRequest'
     flag = fun.sslJudge(url)
