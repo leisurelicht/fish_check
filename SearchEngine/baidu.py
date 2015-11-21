@@ -18,13 +18,14 @@ class Baidu_Search(object):
         super(Baidu_Search, self).__init__()
 
         self.configFile = 'fishconfig.ini'
-        self.targetUrl = fun.readConfig(self.configFile,'Baidu-Search','SiteUrl')
-        self.pageNum = int(fun.readConfig(self.configFile,'Baidu-Search','pageNum'))
-        self.Search_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Search_KeyWord')
+        self.whiteUrl = fun.readConfig(self.configFile,'Baidu-Search','WhiteUrl')
+        self.pageNum = int(fun.readConfig(self.configFile,'Baidu-Search','PageNum'))
+        self.Search_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Search_KeyWord').split(',')
         self.Compare_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Compare_Title')
 
         self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
-        self.searchTarget = self.searchUrl.replace('@',unicode(self.Search_KeyWord,"utf-8"))
+        for keyword in self.Search_KeyWord:
+            self.searchTarget = self.searchUrl.replace('@',unicode(keyword,"utf-8"))
 
         self.header = config.header
         self.header['Referer'] = 'http://www.baidu.com'
@@ -74,11 +75,13 @@ class Baidu_Search(object):
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
                 if title == self.Compare_KeyWord:
-                    pen.write('title:'+title+'\n')
-                    pen.write('url:'+url+'\n')
-                    pen.write('***********'+'\n')
-                    pen.flush()
-                    #if self.pageCompare(self.targetUrl,url):
+                    if not fun.urlCompare(url,self.whiteUrl):
+                        continue
+                    else:
+                        pen.write('url:'+url+'\n')
+                        pen.write('***********'+'\n')
+                        pen.flush()
+                    #if self.pageCompare(self.whiteUrl,url):
                     #    print '开始记录可能的钓鱼网站'
                     #    pen.write('title:'+title)
                     #    pen.write('url:'+url)
@@ -90,9 +93,9 @@ class Baidu_Search(object):
                     continue
         pen.close()
 '''
-    def pageCompare(self,targeturl,url):
+    def pageCompare(self,whiteUrl,url):
         print 'pageCompare'
-        payload = {'domain':targeturl,'domain1':url,'btnS':'查询'}
+        payload = {'domain':whiteUrl,'domain1':url,'btnS':'查询'}
         while True:
             try:
                 start = time.time()
