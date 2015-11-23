@@ -51,6 +51,8 @@ class Bing_Search(object):
                             title_result.append(site.a.get_text().strip())
                             result[site.a.get('href').strip()] = title_result[:]
                             title_result.pop()
+                        else:
+                            continue
                 else:
                     continue
             else:

@@ -46,9 +46,12 @@ class Baidu_Search(object):
             connect , page = net.dataRequest(url,self.header)
             sites = page.find_all('div',id = re.compile("^\d+$"))
             for site in sites:
-                title_url[site.h3.a.get_text()] = site.h3.a.get('href')
-                id_title_url[site['id']] = title_url.copy()
-                title_url.clear()
+                if site:
+                    title_url[site.h3.a.get_text()] = site.h3.a.get('href')
+                    id_title_url[site['id']] = title_url.copy()
+                    title_url.clear()
+                else:
+                    continue
         return  id_title_url
 
     def titleGet(self,id_titleANDurl):
