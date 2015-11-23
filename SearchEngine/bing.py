@@ -16,13 +16,14 @@ class Bing_Search(object):
         super(Bing_Search, self).__init__()
 
         self.configFile = './fishconfig.ini'
-        self.targetUrl = fun.readConfig(self.configFile,'Bing-Search','SiteUrl')
-        self.pageNum = int(fun.readConfig(self.configFile,'Bing-Search','pageNum'))
-        self.Search_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Search_KeyWord')
-        self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_KeyWord')
+        self.whiteUrl = fun.readConfig(self.configFile,'Bing-Search','WhiteUrl')
+        self.pageNum = int(fun.readConfig(self.configFile,'Bing-Search','PageNum'))
+        self.Search_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Search_KeyWord').split(',')
+        self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_Title')
 
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
-        self.searchTarget = self.searchUrl.replace('@',self.Search_KeyWord)
+        for keyword in self.Search_KeyWord:
+            self.searchTarget = self.searchUrl.replace('@',keyword)
 
         self.header = config.header
         self.header['Referer'] = 'http://cn.bing.com/'
@@ -31,6 +32,7 @@ class Bing_Search(object):
     def pageGet(self):
         '''
         获取页面
+        返回格式为{url:[title],}格式的数据
         '''
         print "pageGet"
         urls_search = []
@@ -49,6 +51,8 @@ class Bing_Search(object):
                             title_result.append(site.a.get_text().strip())
                             result[site.a.get('href').strip()] = title_result[:]
                             title_result.pop()
+                        else:
+                            continue
                 else:
                     continue
             else:
@@ -80,9 +84,12 @@ class Bing_Search(object):
         pen = open('./Result/possiblesite_bing.txt','a')
         for url,titles in total_titleANDurl.iteritems():
             if self.Compare_KeyWord == titles[0] or self.Compare_KeyWord == titles[-1]:
-                pen.write('url:'+url+'\n')
-                pen.write('***********'+'\n')
-                pen.flush()
+                if not fun.urlCompare(url,self.whiteUrl):
+                    continue
+                else:
+                    pen.write('url:'+url+'\n')
+                    pen.write('***********'+'\n')
+                    pen.flush()
             else:
                 continue
         pen.close()

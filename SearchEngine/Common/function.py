@@ -3,6 +3,7 @@
 #本文件内保存一些共用的函数
 
 import urlparse
+from tld import get_tld
 from ConfigParser import ConfigParser
 
 #配置读取函数
@@ -50,3 +51,18 @@ def urlCheck(url_str):
             return urlparse.urlunsplit(url)
         else:
             return url_str
+
+def urlCompare(url1,url2):
+    '''
+    比较两个url的域名是否相同
+    相同返回 0
+    不相同返回比较值
+    '''
+    urlone = get_tld(url1)
+    urltwo = get_tld(url2)
+    return cmp(urlone,urltwo)
+
+
+
+if __name__=="__main__":
+    urlCompare('http://www.bankofshanghai.com','https://ibank.bankofshanghai.com/eweb/vx_zh_CN/login.html?LoginType=R&_locale=zh_CN')
