@@ -4,12 +4,13 @@
 
 import sys
 import requests
+import config
 from bs4 import BeautifulSoup
-from . import function as fun
+import function as fun
 
 
 #页面读取函数,その１
-def Request(url,header):
+def Request(url):
     '''
     获取网页后不处理
     返回一个requests类型的连接
@@ -20,7 +21,7 @@ def Request(url,header):
     count = 0
     while True:
         try:
-            page = requests.get( url , headers = header, timeout = 10 , verify = flag )
+            page = requests.get( url , headers = config.header, timeout = 10 , verify = flag )
         except requests.exceptions.ConnectionError:
             print 'ConnectionError'
             if flag == True:
@@ -137,7 +138,7 @@ def dataRequest(url,header):
             print 'HTTPError'
             return (None,None)
         except requests.exceptions.RequestException as e:
-            errortext = "Error in function : \" %s \" ,\n \
+            errortext = "Error in function requests: \" %s \" ,\n \
                 Error name is : \" %s \" ,\n \
                 Error type is : \" %s \" ,\n \
                 Error Message is : \" %s \" ,\n \
@@ -162,9 +163,9 @@ def dataRequest(url,header):
                     count += 1
                     continue
     try:
-        soup = BeautifulSoup(html)
+        soup = BeautifulSoup(html,from_encoding='utf-8')
     except Exception as e:
-        errortext = "Error in function : \" %s \" ,\n \
+        errortext = "Error in function soup: \" %s \" ,\n \
                 Error name is : \" %s \" ,\n \
                 Error type is : \" %s \" ,\n \
                 Error Message is : \" %s \" ,\n \
@@ -178,3 +179,10 @@ def dataRequest(url,header):
         return (page,None)
     else:
         return (page,soup)
+
+if __name__ == "__main__":
+    con ,pag = dataRequest('http://download1.bankofshanghai.com/kjxzdoc/ocx/mobile.pdf',config.header)
+    if pag:
+        if pag.title:
+            print pag.original_encoding
+            print pag

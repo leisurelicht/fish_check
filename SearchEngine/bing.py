@@ -22,8 +22,9 @@ class Bing_Search(object):
         self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_Title')
 
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
+        self.searchTargetlist = []
         for keyword in self.Search_KeyWord:
-            self.searchTarget = self.searchUrl.replace('@',keyword)
+            self.searchTargetlist.append(self.searchUrl.replace('@',keyword))
 
         self.header = config.header
         self.header['Referer'] = 'http://cn.bing.com/'
@@ -38,25 +39,27 @@ class Bing_Search(object):
         urls_search = []
         result = {}
         title_result = []
-        for num in range(1,self.pageNum+1):
-            urls_search.append(self.searchTarget.replace('#',str((num-1)*10)))
-        for url in urls_search:
-            url  = fun.urlCheck(url)
-            if url:
-                connect , page = net.dataRequest(url,self.header)
-                if page:
-                    sites = page.find_all('h2')
-                    for site in sites:
-                        if site.a:
-                            title_result.append(site.a.get_text().strip())
-                            result[site.a.get('href').strip()] = title_result[:]
-                            title_result.pop()
-                        else:
-                            continue
+        for searchTarget in self.searchTargetlist:
+            for num in range(1,self.pageNum+1):
+                urls_search.append(searchTarget.replace('#',str((num-1)*10)))
+            for url in urls_search:
+                url  = fun.urlCheck(url)
+                if url:
+                    connect , page = net.dataRequest(url,self.header)
+                    if page:
+                        sites = page.find_all('h2')
+                        for site in sites:
+                            if site.a:
+                                title_result.append(site.a.get_text().strip())
+                                result[site.a.get('href').strip()] = title_result[:]
+                                title_result.pop()
+                            else:
+                                continue
+                    else:
+                        continue
                 else:
                     continue
-            else:
-                continue
+            urls_search = []
         return result
 
     def titleGet(self,url_title):
@@ -70,7 +73,14 @@ class Bing_Search(object):
             if url:
                 connect , page = net.dataRequest(url,self.header)
                 if page:
-                    titles.append(page.title.get_text())
+                    if page.title:
+                        titles.append(page.title.get_text())
+                    else:
+                        print "no title:"+url
+                        continue
+                else:
+                    print "none:"+url
+                    continue
             else:
                 continue
         return url_title
