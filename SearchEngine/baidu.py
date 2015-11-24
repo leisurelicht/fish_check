@@ -43,11 +43,9 @@ class Baidu_Search(object):
         id_title_url = {}
         id_sign = 1
         for searchTarget in self.searchTargetlist:
-            print searchTarget
             for num in range(1,self.pageNum+1):
                 urls.append(searchTarget.replace('#',str((num-1)*10)))
             for url in urls:
-                print url
                 connect , page = net.dataRequest(url,self.header)
                 sites = page.find_all('div',id = re.compile("^\d+$"))
                 for site in sites:
