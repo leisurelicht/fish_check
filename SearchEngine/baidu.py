@@ -23,9 +23,10 @@ class Baidu_Search(object):
         self.Search_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Search_KeyWord').split(',')
         self.Compare_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Compare_Title')
 
-        self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8'
+        self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8&nojc=1'
+        self.searchTargetlist = []
         for keyword in self.Search_KeyWord:
-            self.searchTarget = self.searchUrl.replace('@',unicode(keyword,"utf-8"))
+            self.searchTargetlist.append(self.searchUrl.replace('@',unicode(keyword,"utf-8")))
 
         self.header = config.header
         self.header['Referer'] = 'http://www.baidu.com'
@@ -40,24 +41,36 @@ class Baidu_Search(object):
         urls = []
         title_url = {}
         id_title_url = {}
-        for num in range(1,self.pageNum+1):
-            urls.append(self.searchTarget.replace('#',str((num-1)*10)))
-        for url in urls:
-            connect , page = net.dataRequest(url,self.header)
-            sites = page.find_all('div',id = re.compile("^\d+$"))
-            for site in sites:
-                if site:
-                    title_url[site.h3.a.get_text()] = site.h3.a.get('href')
-                    id_title_url[site['id']] = title_url.copy()
-                    title_url.clear()
-                else:
-                    continue
+        id_sign = 1
+        for searchTarget in self.searchTargetlist:
+            print searchTarget
+            for num in range(1,self.pageNum+1):
+                urls.append(searchTarget.replace('#',str((num-1)*10)))
+            for url in urls:
+                print url
+                connect , page = net.dataRequest(url,self.header)
+                sites = page.find_all('div',id = re.compile("^\d+$"))
+                for site in sites:
+                    if site:
+                        title_url[site.h3.a.get_text()] = site.h3.a.get('href')
+                        #id_title_url[site['id']] = title_url.copy()
+                        id_title_url[id_sign] = title_url.copy()
+                        id_sign += 1
+                        title_url.clear()
+                    else:
+                        continue
+            urls = []
+        #for id_tmp,title_url in id_title_url.iteritems():
+        #    for title,url in title_url.iteritems():
+        #        print "id:" + str(id_tmp)
+        #        print 'title:' + title
+        #        print 'url:' + url
         return  id_title_url
 
     def titleGet(self,id_titleANDurl):
         '''
         '''
-        for _id,titleANDurl in id_titleANDurl.iteritems():
+        for id_tmp,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
                 connect , page = net.dataRequest(url,self.header)
                 print 'baidu:',url
