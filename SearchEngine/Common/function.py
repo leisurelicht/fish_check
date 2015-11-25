@@ -52,12 +52,14 @@ def urlCheck(url_str):
         else:
             return url_str
 
+#url比较函数
 def urlCompare(url1,url2):
     '''
     比较两个url的域名是否相同
     相同返回 0
     不相同返回比较值
     '''
+    print 'urlCompare'
     urlone = get_tld(url1)
     urltwo = get_tld(url2)
     return cmp(urlone,urltwo)
