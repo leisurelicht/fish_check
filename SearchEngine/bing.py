@@ -74,12 +74,15 @@ class Bing_Search(object):
                 connect , page = net.dataRequest(url,self.header)
                 if page:
                     if page.title:
-                        titles.append(page.title.get_text())
+                        #print 'title1:',titles[0]
+                        #print 'title2:',page.title.get_text().strip()
+                        #print 'url:',url
+                        titles.append(page.title.get_text().strip())
                     else:
                         print "no title:"+url
                         continue
                 else:
-                    print "none:"+url
+                    print "页面不存在:"+url
                     continue
             else:
                 continue
@@ -94,7 +97,7 @@ class Bing_Search(object):
         pen = open('./Result/possiblesite_bing.txt','a')
         for url,titles in total_titleANDurl.iteritems():
             if self.Compare_KeyWord == titles[0] or self.Compare_KeyWord == titles[-1]:
-                if not fun.urlCompare(url,self.whiteUrl):
+                if fun.urlCompare(url,self.whiteUrl) == 0:
                     continue
                 else:
                     pen.write('url:'+url+'\n')
