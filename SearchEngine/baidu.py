@@ -50,19 +50,24 @@ class Baidu_Search(object):
                 sites = page.find_all('div',id = re.compile("^\d+$"))
                 for site in sites:
                     if site:
-                        title_url[site.h3.a.get_text()] = site.h3.a.get('href')
-                        #id_title_url[site['id']] = title_url.copy()
-                        id_title_url[id_sign] = title_url.copy()
-                        id_sign += 1
-                        title_url.clear()
+                        if site.h3:
+                            if site.h3.a:
+                                title_url[site.h3.a.get_text()] = site.h3.a.get('href')
+                                id_title_url[id_sign] = title_url.copy()
+                                id_sign += 1
+                                title_url.clear()
+                            else:
+                                continue
+                        else:
+                            continue
                     else:
                         continue
             urls = []
-        #for id_tmp,title_url in id_title_url.iteritems():
-        #    for title,url in title_url.iteritems():
-        #        print "id:" + str(id_tmp)
-        #        print 'title:' + title
-        #        print 'url:' + url
+        #for a,b in id_title_url.iteritems():
+        #    for c,d in b.iteritems():
+        #        print a
+        #        print c
+        #        print d
         return  id_title_url
 
     def titleGet(self,id_titleANDurl):
@@ -89,7 +94,7 @@ class Baidu_Search(object):
         for _id,titleANDurl in id_titleANDurl.iteritems():
             for title,url in titleANDurl.iteritems():
                 if title == self.Compare_KeyWord:
-                    if not fun.urlCompare(url,self.whiteUrl):
+                    if fun.urlCompare(url,self.whiteUrl) == 0:
                         continue
                     else:
                         pen.write('url:'+url+'\n')
