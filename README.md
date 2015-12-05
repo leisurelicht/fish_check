@@ -10,7 +10,7 @@
 
 requests2.5.3
 
-* 一般pip默认安装
+* pip install requests
 
 BeautifulSoup4.3.2
 
