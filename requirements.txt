@@ -1,0 +1,7 @@
+requests==2.5.3
+BeautifulSoup==4.3.2
+html5lib
+tld
+apscheduler==3.0.3
+chardet
+certifi

@@ -35,6 +35,12 @@ apscheduler3.0.3
 
 * pip install certifi
 
+或者直接执行
+
+* pip install -r requirements.txt
+
+就可以了
+
 ----
 
 修改fishconfig.ini文件更改配置
