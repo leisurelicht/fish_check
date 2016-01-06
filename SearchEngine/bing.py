@@ -1,51 +1,53 @@
 #! /usr/bin/env python
-#-*- coding=utf-8 -*-
+# -*- coding=utf-8 -*-
 import os
 import sys
+import time
+import random
 from Common import config
 from Common import function as fun
 from Common import network as net
 
-
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-class Bing_Search(object):
-    """docstring for Bing_Search"""
-    def __init__(self,):
-        super(Bing_Search, self).__init__()
 
-        self.configFile = './fishconfig.ini'
-        self.whiteUrl = fun.readConfig(self.configFile,'Bing-Search','WhiteUrl')
-        self.pageNum = int(fun.readConfig(self.configFile,'Bing-Search','PageNum'))
-        self.Search_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Search_KeyWord').split(',')
-        self.Compare_KeyWord = fun.readConfig(self.configFile,'Bing-Search','Compare_Title')
+class BingSearch(object):
+    """docstring for Bing_Search"""
+    def __init__(self, config_file):
+        super(BingSearch, self).__init__()
+
+        self.configFile = config_file
+        self.white_Domain = fun.read_config(self.configFile, 'Bing-Search', 'White_Domain').split(',')
+        self.pageNum = int(fun.read_config(self.configFile, 'Bing-Search', 'Page_Num'))
+        self.Search_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Search_KeyWord').split(',')
+        self.Compare_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Compare_Title')
 
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
         self.searchTargetlist = []
         for keyword in self.Search_KeyWord:
-            self.searchTargetlist.append(self.searchUrl.replace('@',keyword))
+            self.searchTargetlist.append(self.searchUrl.replace('@', keyword))
 
         self.header = config.header
         self.header['Referer'] = 'http://cn.bing.com/'
-        #self.header['host'] = 'cn.bing.com'
+        # self.header['host'] = 'cn.bing.com'
 
-    def pageGet(self):
-        '''
+    def page_get(self):
+        """
         获取页面
         返回格式为{url:[title],}格式的数据
-        '''
-        print "pageGet"
+        """
+        print "page_get"
         urls_search = []
         result = {}
         title_result = []
         for searchTarget in self.searchTargetlist:
-            for num in range(1,self.pageNum+1):
-                urls_search.append(searchTarget.replace('#',str((num-1)*10)))
+            for num in range(1, self.pageNum+1):
+                urls_search.append(searchTarget.replace('#', str((num-1)*10)))
             for url in urls_search:
-                url  = fun.urlCheck(url)
+                url = fun.url_check(url)
                 if url:
-                    connect , page = net.dataRequest(url,self.header)
+                    connect, page = net.data_soup(url, self.header)
                     if page:
                         sites = page.find_all('h2')
                         for site in sites:
@@ -62,58 +64,59 @@ class Bing_Search(object):
             urls_search = []
         return result
 
-    def titleGet(self,url_title):
-        '''
+    def title_get(self, url_title):
+        """
         获取url链接内的网站标题
         返回格式为{url:[title1,title2],url:[title1,title2]}的数据
-        '''
-        print 'titleGet'
-        for url,titles in url_title.iteritems():
-            url  = fun.urlCheck(url)
+        :param url_title:
+        """
+        print 'title_get'
+        url_titles = {}
+        for url, title_list in url_title.iteritems():
+            url = fun.url_check(url)
             if url:
-                connect , page = net.dataRequest(url,self.header)
+                connect, page = net.data_soup(url, self.header)
                 if page:
                     if page.title:
-                        #print 'title1:',titles[0]
-                        #print 'title2:',page.title.get_text().strip()
-                        #print 'url:',url
-                        titles.append(page.title.get_text().strip())
+                        title_list.append(page.title.get_text().strip())
+                        url_titles[connect.url]=title_list
                     else:
-                        print "no title:"+url
+                        print "无法获取当前URL的网页标题:"+url
                         continue
                 else:
                     print "页面不存在:"+url
                     continue
             else:
                 continue
-        return url_title
+        return url_titles
 
-    def titleCompare(self,total_titleANDurl):
-        '''
-        '''
-        print 'titleCompare'
-        if os.path.exists( './Result/possiblesite_bing.txt' ):
-            os.remove('./Result/possiblesite_bing.txt')
-        pen = open('./Result/possiblesite_bing.txt','a')
-        for url,titles in total_titleANDurl.iteritems():
-            if self.Compare_KeyWord == titles[0] or self.Compare_KeyWord == titles[-1]:
-                if fun.urlCompare(url,self.whiteUrl) == 0:
-                    continue
-                else:
-                    pen.write('url:'+url+'\n')
-                    pen.write('***********'+'\n')
-                    pen.flush()
-            else:
-                continue
+    def title_compare(self, total_title_and_url):
+        """
+        :param total_title_and_url:
+        """
+        print 'title_compare'
+        for url, title_list in total_title_and_url.iteritems():
+            if fun.get_domain(url) in self.white_Domain:
+                print url
+
+            # if self.Compare_KeyWord == title_list[0] or self.Compare_KeyWord == title_list[-1]:
+            #     if fun.url_compare(url, self.white_Domain) == 0:
+            #         continue
+            #     else:
+            #         pen.write('url:'+url+'\n')
+            #         pen.write('***********'+'\n')
+            #         pen.flush()
+            # else:
+            #     continue
         pen.close()
 
-if __name__=="__main__":
-    bing = Bing_Search()
-    #a = bing.dataRequest('http://www.sbacn.org/')
-    #print a.title
-    urls = bing.pageGet()
-    titles=bing.titleGet(urls)
-    bing.titleCompare(titles)
+if __name__ == "__main__":
+    bing = BingSearch('../fishconfig.ini')
+    # a = bing.data_soup('http://www.sbacn.org/')
+    # print a.title
+    urls = bing.page_get()
+    titles = bing.title_get(urls)
+    bing.title_compare(titles)
 
-    #a= bing.urlCheck('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
-    #print a
+    # a= bing.url_check('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
+    # print a
