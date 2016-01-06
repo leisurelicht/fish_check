@@ -1,5 +1,6 @@
 #! /usr/bin/env python
-#-*- coding=utf-8 -*-
+# -*- coding=utf-8 -*-
+
 import re
 import os
 import sys
@@ -12,42 +13,41 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-class Baidu_Search(object):
-    """docstring for Baidu_Search"""
-    def __init__(self,):
-        super(Baidu_Search, self).__init__()
+class BaiduSearch(object):
+    """docstring for baidu_search"""
+    def __init__(self,config_file):
+        super(BaiduSearch, self).__init__()
 
-        self.configFile = 'fishconfig.ini'
-        self.whiteUrl = fun.readConfig(self.configFile,'Baidu-Search','WhiteUrl')
-        self.pageNum = int(fun.readConfig(self.configFile,'Baidu-Search','PageNum'))
-        self.Search_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Search_KeyWord').split(',')
-        self.Compare_KeyWord = fun.readConfig(self.configFile,'Baidu-Search','Compare_Title')
+        self.configFile = config_file
+        self.white_Domain = fun.read_config(self.configFile, 'Baidu-Search', 'White_Domain').split(',')
+        self.pageNum = int(fun.read_config(self.configFile, 'Baidu-Search', 'Page_Num'))
+        self.Search_KeyWord = fun.read_config(self.configFile, 'Baidu-Search', 'Search_KeyWord').split(',')
+        self.Compare_KeyWord = fun.read_config(self.configFile, 'Baidu-Search', 'Compare_Title')
 
         self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8&nojc=1'
         self.searchTargetlist = []
         for keyword in self.Search_KeyWord:
-            self.searchTargetlist.append(self.searchUrl.replace('@',unicode(keyword,"utf-8")))
+            self.searchTargetlist.append(self.searchUrl.replace('@', unicode(keyword, "utf-8")))
 
         self.header = config.header
         self.header['Referer'] = 'http://www.baidu.com'
 
-
-    def pageGet(self):
-        '''
+    def page_get(self):
+        """
         获取页面
         返回格式为{id:{title:url},}的数据
-        '''
-        print "pageGet"
+        """
+        print "page_get"
         urls = []
         title_url = {}
         id_title_url = {}
         id_sign = 1
         for searchTarget in self.searchTargetlist:
-            for num in range(1,self.pageNum+1):
-                urls.append(searchTarget.replace('#',str((num-1)*10)))
+            for num in range(1, self.pageNum+1):
+                urls.append(searchTarget.replace('#', str((num-1)*10)))
             for url in urls:
-                connect , page = net.dataRequest(url,self.header)
-                sites = page.find_all('div',id = re.compile("^\d+$"))
+                connect, page = net.data_soup(url, self.header)
+                sites = page.find_all('div', id=re.compile("^\d+$"))
                 for site in sites:
                     if site:
                         if site.h3:
@@ -63,50 +63,51 @@ class Baidu_Search(object):
                     else:
                         continue
             urls = []
-        #for a,b in id_title_url.iteritems():
+        # for a,b in id_title_url.iteritems():
         #    for c,d in b.iteritems():
         #        print a
         #        print c
         #        print d
-        return  id_title_url
+        return id_title_url
 
-    def titleGet(self,id_titleANDurl):
-        '''
-        '''
-        for id_tmp,titleANDurl in id_titleANDurl.iteritems():
-            for title,url in titleANDurl.iteritems():
-                connect , page = net.dataRequest(url,self.header)
-                print 'baidu:',url
+    def title_get(self, id_title_and_url):
+        """
+        :param id_title_and_url:
+        """
+        for id_tmp, titleANDurl in id_title_and_url.iteritems():
+            for title, url in titleANDurl.iteritems():
+                connect, page = net.data_soup(url, self.header)
+                print 'baidu:', url
                 if connect:
-                    print 'moto:',connect.url
+                    print 'moto:', connect.url
                 else:
                     print 'None'
                 print '*'*5
 
-
-    def titleCompare(self,id_titleANDurl):
-        '''
-        '''
-        print 'titleCompare'
-        if os.path.exists( './Result/possiblesite_baidu.txt' ):
+    def title_compare(self, id_title_and_url):
+        """
+        :param id_title_and_url:
+        """
+        print 'title_compare'
+        if os.path.exists('./Result/possiblesite_baidu.txt'):
             os.remove('./Result/possiblesite_baidu.txt')
-        pen = open('./Result/possiblesite_baidu.txt','a')
-        for _id,titleANDurl in id_titleANDurl.iteritems():
-            for title,url in titleANDurl.iteritems():
+        pen = open('./Result/possiblesite_baidu.txt', 'a')
+        for _id, title_and_url in id_title_and_url.iteritems():
+            for title, url in title_and_url.iteritems():
                 if title == self.Compare_KeyWord:
-                    if fun.urlCompare(url,self.whiteUrl) == 0:
+                    if fun.url_compare(url, self.white_Domain) == 0:
                         continue
                     else:
                         pen.write('url:'+url+'\n')
                         pen.write('***********'+'\n')
                         pen.flush()
-                    #if self.pageCompare(self.whiteUrl,url):
+                    # if self.pageCompare(self.whiteUrl,url):
                     #    print '开始记录可能的钓鱼网站'
                     #    pen.write('title:'+title)
                     #    pen.write('url:'+url)
                     #    pen.write('***********')
                     #    pen.flush()
-                    #else:
+                    # else:
                     #    print '检查下一个网站'
                 else:
                     continue
@@ -151,9 +152,8 @@ class Baidu_Search(object):
 '''
 
 
-if __name__=="__main__":
-    baidu = Baidu_Search()
-    baidu.pageGet()
-    #baidu.titleCompare(baidu.pageGet())
-    #baidu.pageCompare()
-
+if __name__ == "__main__":
+    baidu = BaiduSearch('../fishconfig.ini')
+    baidu.page_get()
+    # baidu.title_compare(baidu.page_get())
+    # baidu.pageCompare()
