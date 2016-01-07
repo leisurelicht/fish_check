@@ -95,20 +95,14 @@ class BingSearch(object):
         :param total_title_and_url:
         """
         print 'title_compare'
+        url_and_title={}
         for url, title_list in total_title_and_url.iteritems():
-            if fun.get_domain(url) in self.white_Domain:
-                print url
-
-            # if self.Compare_KeyWord == title_list[0] or self.Compare_KeyWord == title_list[-1]:
-            #     if fun.url_compare(url, self.white_Domain) == 0:
-            #         continue
-            #     else:
-            #         pen.write('url:'+url+'\n')
-            #         pen.write('***********'+'\n')
-            #         pen.flush()
-            # else:
-            #     continue
-        pen.close()
+            if fun.get_domain(url) not in self.white_Domain:
+                if self.Compare_KeyWord in title_list[0] or self.Compare_KeyWord in title_list[-1]:
+                    url_and_title[url] = title_list
+            else:
+                continue
+        print url_and_title
 
 if __name__ == "__main__":
     bing = BingSearch('../fishconfig.ini')
@@ -120,3 +114,4 @@ if __name__ == "__main__":
 
     # a= bing.url_check('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # print a
+    print time.time()
