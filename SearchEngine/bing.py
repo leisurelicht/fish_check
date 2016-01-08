@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 # -*- coding=utf-8 -*-
+
 import os
 import sys
 import time
-import random
 from Common import config
 from Common import function as fun
 from Common import network as net
+from Common import database as db
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -24,13 +25,14 @@ class BingSearch(object):
         self.Compare_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Compare_Title')
 
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
-        self.searchTargetlist = []
+        self.searchTarget_list = []
         for keyword in self.Search_KeyWord:
-            self.searchTargetlist.append(self.searchUrl.replace('@', keyword))
+            self.searchTarget_list.append(self.searchUrl.replace('@', keyword))
 
         self.header = config.header
         self.header['Referer'] = 'http://cn.bing.com/'
         # self.header['host'] = 'cn.bing.com'
+        self.connect = db.connect_bing()
 
     def page_get(self):
         """
@@ -41,7 +43,7 @@ class BingSearch(object):
         urls_search = []
         result = {}
         title_result = []
-        for searchTarget in self.searchTargetlist:
+        for searchTarget in self.searchTarget_list:
             for num in range(1, self.pageNum+1):
                 urls_search.append(searchTarget.replace('#', str((num-1)*10)))
             for url in urls_search:
@@ -79,7 +81,7 @@ class BingSearch(object):
                 if page:
                     if page.title:
                         title_list.append(page.title.get_text().strip())
-                        url_titles[connect.url]=title_list
+                        url_titles[connect.url] = title_list
                     else:
                         print "无法获取当前URL的网页标题:"+url
                         continue
@@ -95,14 +97,20 @@ class BingSearch(object):
         :param total_title_and_url:
         """
         print 'title_compare'
-        url_and_title={}
+        url_and_title = []
+        url_and_title_temp = {}
         for url, title_list in total_title_and_url.iteritems():
             if fun.get_domain(url) not in self.white_Domain:
                 if self.Compare_KeyWord in title_list[0] or self.Compare_KeyWord in title_list[-1]:
-                    url_and_title[url] = title_list
+                    url_and_title_temp['url'] = url
+                    url_and_title_temp['title1'] = title_list[0]
+                    url_and_title_temp['title2'] = title_list[-1]
+                    url_and_title.append(url_and_title_temp.copy())
+                    url_and_title_temp.clear()
+
             else:
                 continue
-        print url_and_title
+        db.insert_data(self.connect, url_and_title)
 
 if __name__ == "__main__":
     bing = BingSearch('../fishconfig.ini')
@@ -111,7 +119,5 @@ if __name__ == "__main__":
     urls = bing.page_get()
     titles = bing.title_get(urls)
     bing.title_compare(titles)
-
     # a= bing.url_check('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # print a
-    print time.time()
