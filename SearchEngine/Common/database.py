@@ -19,6 +19,19 @@ def connect_bing():
         return collection
 
 
+def connect_baidu():
+    print 'connect_bing'
+    try:
+        client = pymongo.MongoClient(host, port)
+    except Exception as e:
+        error_text = fun.exception_format(fun.get_current_function_name(), e)
+        print error_text
+    else:
+        db = client.fish_check
+        collection = db.baidu
+        return collection
+
+
 def insert_data(collection, database):
     print 'insert_data'
     try:
