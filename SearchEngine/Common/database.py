@@ -45,6 +45,14 @@ def insert_data(collection, database):
 
 
 def is_url_exist(collection, url):
+    """
+    判断一个URL是否已经被存入数据库中
+    存在 返回True
+    不存在 返回False
+    :param collection:
+    :param url:
+    :return:
+    """
     print 'search_url'
     try:
         temp = collection.find({'url': url})
@@ -52,7 +60,10 @@ def is_url_exist(collection, url):
         error_text = fun.exception_format(fun.get_current_function_name(), e)
         print error_text
     else:
-        return temp.count()
+        if temp.count() == 0:
+            return False
+        else:
+            return True
 
 
 def remove_date(collection):

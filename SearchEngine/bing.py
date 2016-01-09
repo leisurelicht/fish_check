@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 # -*- coding=utf-8 -*-
 
-import os
 import sys
-import time
 from Common import config
 from Common import function as fun
 from Common import network as net
@@ -107,10 +105,24 @@ class BingSearch(object):
                     url_and_title_temp['title2'] = title_list[-1]
                     url_and_title.append(url_and_title_temp.copy())
                     url_and_title_temp.clear()
-
             else:
                 continue
-        db.insert_data(self.connect, url_and_title)
+        return url_and_title
+        #db.insert_data(self.connect, url_and_title)
+
+    def into_database(self, url_and_title):
+        """
+        将URL查重后,存入数据库,
+        :param url_and_title:
+        :return:
+        """
+        print 'url_and_title'
+        for tmp in url_and_title:
+            if not db.is_url_exist(self.connect, tmp['url']):
+                db.insert_data(self.connect, tmp)
+            else:
+                continue
+
 
 if __name__ == "__main__":
     bing = BingSearch('../fishconfig.ini')
@@ -118,6 +130,6 @@ if __name__ == "__main__":
     # print a.title
     urls = bing.page_get()
     titles = bing.title_get(urls)
-    bing.title_compare(titles)
+    bing.into_database(bing.title_compare(titles))
     # a= bing.url_check('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # print a
