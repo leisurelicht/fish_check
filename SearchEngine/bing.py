@@ -6,16 +6,16 @@ from Common import config
 from Common import function as fun
 from Common import network as net
 from Common import database as db
+from Common import baseclass
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-class BingSearch(object):
+class BingSearch(baseclass.base):
     """docstring for Bing_Search"""
     def __init__(self, config_file):
         super(BingSearch, self).__init__()
-
         self.configFile = config_file
         self.white_Domain = fun.read_config(self.configFile, 'Bing-Search', 'White_Domain').split(',')
         self.pageNum = int(fun.read_config(self.configFile, 'Bing-Search', 'Page_Num'))
@@ -40,7 +40,6 @@ class BingSearch(object):
         print "page_get"
         urls_search = []
         result = {}
-        title_result = []
         for searchTarget in self.searchTarget_list:
             for num in range(1, self.pageNum+1):
                 urls_search.append(searchTarget.replace('#', str((num-1)*10)))
@@ -52,9 +51,7 @@ class BingSearch(object):
                         sites = page.find_all('h2')
                         for site in sites:
                             if site.a:
-                                title_result.append(site.a.get_text().strip())
-                                result[site.a.get('href').strip()] = title_result[:]
-                                title_result.pop()
+                                result[site.a.get('href').strip()] = site.a.get_text().strip()
                             else:
                                 continue
                     else:
@@ -71,15 +68,19 @@ class BingSearch(object):
         :param url_title:
         """
         print 'title_get'
-        url_titles = {}
-        for url, title_list in url_title.iteritems():
+        url_and_title = []
+        url_and_title_temp = {}
+        for url, title in url_title.iteritems():
             url = fun.url_check(url)
             if url:
                 connect, page = net.data_soup(url, self.header)
                 if page:
                     if page.title:
-                        title_list.append(page.title.get_text().strip())
-                        url_titles[connect.url] = title_list
+                        url_and_title_temp['URL'] = connect.url
+                        url_and_title_temp['TITLE1'] = title
+                        url_and_title_temp['TITLE2'] = page.title.get_text().strip()
+                        url_and_title.append(url_and_title_temp.copy())
+                        url_and_title_temp.clear()
                     else:
                         print "无法获取当前URL的网页标题:"+url
                         continue
@@ -88,48 +89,30 @@ class BingSearch(object):
                     continue
             else:
                 continue
-        return url_titles
+        return url_and_title
 
-    def title_compare(self, total_title_and_url):
+    def title_compare(self, total_url_and_title):
         """
-        :param total_title_and_url:
+        :param total_url_and_title:
         """
         print 'title_compare'
         url_and_title = []
-        url_and_title_temp = {}
-        for url, title_list in total_title_and_url.iteritems():
-            if fun.get_domain(url) not in self.white_Domain:
-                if self.Compare_KeyWord in title_list[0] or self.Compare_KeyWord in title_list[-1]:
-                    url_and_title_temp['url'] = url
-                    url_and_title_temp['title1'] = title_list[0]
-                    url_and_title_temp['title2'] = title_list[-1]
+        for url_and_title_temp in total_url_and_title:
+            if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
+                if self.Compare_KeyWord in url_and_title_temp['TITLE1'] or \
+                                self.Compare_KeyWord in url_and_title_temp['TITLE2']:
                     url_and_title.append(url_and_title_temp.copy())
-                    url_and_title_temp.clear()
             else:
                 continue
         return url_and_title
-        #db.insert_data(self.connect, url_and_title)
-
-    def into_database(self, url_and_title):
-        """
-        将URL查重后,存入数据库,
-        :param url_and_title:
-        :return:
-        """
-        print 'url_and_title'
-        for tmp in url_and_title:
-            if not db.is_url_exist(self.connect, tmp['url']):
-                db.insert_data(self.connect, tmp)
-            else:
-                continue
 
 
 if __name__ == "__main__":
     bing = BingSearch('../fishconfig.ini')
-    # a = bing.data_soup('http://www.sbacn.org/')
-    # print a.title
     urls = bing.page_get()
     titles = bing.title_get(urls)
-    bing.into_database(bing.title_compare(titles))
+    tmp = bing.title_compare(titles)
+    bing.into_database(tmp)
+    # bing.into_database(url='http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # a= bing.url_check('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # print a

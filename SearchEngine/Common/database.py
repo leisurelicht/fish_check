@@ -66,13 +66,15 @@ def is_url_exist(collection, url):
             return True
 
 
+
+
+
 def remove_date(collection):
     collection.remove()
 
 
 if __name__ == "__main__":
     con = connect_bing()
-    search_url(con, 'http://www.bing.com/knows/search?q=%e4%b8%8a%e6%b5%b7%e9%93%b6%e8%a1%8c&mkt=zh-cn')
     # con.remove()
     # for data in con.find():
     #    print data['title']
