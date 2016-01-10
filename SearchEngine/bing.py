@@ -74,21 +74,27 @@ class BingSearch(baseclass.base):
             url = fun.url_check(url)
             if url:
                 connect, page = net.data_soup(url, self.header)
-                if page:
-                    if page.title:
-                        url_and_title_temp['URL'] = connect.url
-                        url_and_title_temp['TITLE1'] = title
-                        url_and_title_temp['TITLE2'] = page.title.get_text().strip()
-                        url_and_title.append(url_and_title_temp.copy())
-                        url_and_title_temp.clear()
+                if connect:
+                    if page:
+                        if page.title:
+                            url_and_title_temp['URL'] = connect.url
+                            url_and_title_temp['TITLE1'] = title
+                            url_and_title_temp['TITLE2'] = page.title.get_text().strip()
+                            url_and_title.append(url_and_title_temp.copy())
+                            url_and_title_temp.clear()
+                        else:
+                            tmp = {'URL':connect.url,'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                            self.into_database(tmp)
+                            # print "无法获取当前URL的网页标题:"+url
+                            continue
                     else:
-                        print "无法获取当前URL的网页标题:"+url
+                        tmp = {'URL':connect.url,'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                        self.into_database(tmp)
                         continue
                 else:
-                    print "页面不存在:"+url
+                    tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}
+                    self.into_database(tmp)
                     continue
-            else:
-                continue
         return url_and_title
 
     def title_compare(self, total_url_and_title):
@@ -109,10 +115,10 @@ class BingSearch(baseclass.base):
 
 if __name__ == "__main__":
     bing = BingSearch('../fishconfig.ini')
-    urls = bing.page_get()
-    titles = bing.title_get(urls)
-    tmp = bing.title_compare(titles)
+    tmp = bing.page_get()
+    tmp = bing.title_get(tmp)
+    tmp = bing.title_compare(tmp)
     bing.into_database(tmp)
-    # bing.into_database(url='http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
+    # bing.into_database('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # a= bing.url_check('http://cn.bing.com/search?q=%E4%B8%8A%E6%B5%B7%E9%93%B6%E8%A1%8C&go=Submit+Query&qs=bs&form=QBRE')
     # print a

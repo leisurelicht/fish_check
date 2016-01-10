@@ -26,8 +26,7 @@ def data_request(url, header):
             page = requests.get(url,
                                 headers=header,
                                 timeout=10,
-                                verify=flag,
-                                stream=True)
+                                verify=flag)
         except requests.exceptions.ConnectTimeout:
             print 'ConnectTimeout'
             if count > 1:

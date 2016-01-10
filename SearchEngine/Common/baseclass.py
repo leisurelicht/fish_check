@@ -12,29 +12,26 @@ class base(object):
         self.connect = None
 
 
-    def into_database(self, ut_list=None, url=None):
+    def into_database(self, ut=None):
         """
-        对URL查重后,存入数据库
-        :param self:
-        :param connect:
-        :param ut_list:
-        :param url:
+        对URL查重后存入数据库
+        :param ut: url and title
         :return:
         """
         print 'into_database'
-        print self.connect
-        if ut_list:
-            for tmp in ut_list:
-                if not db.is_url_exist(self.connect, tmp['URL']):
-                    db.insert_data(self.connect, tmp)
-                else:
-                    continue
-        elif url:
-            print url
-            temp={'URL':url}
-            if not db.is_url_exist(self.connect, url):
-                db.insert_data(self.connect, temp)
+        if ut:
+            if isinstance(ut, str):
+                temp={'URL':ut}
+                if not db.is_url_exist(self.connect, ut):
+                    db.insert_data(self.connect, temp)
+            elif isinstance(ut, dict):
+                if not db.is_url_exist(self.connect, ut['URL']):
+                    db.insert_data(self.connect, ut)
+            elif isinstance(ut, list):
+                for tmp in ut:
+                    if not db.is_url_exist(self.connect, tmp['URL']):
+                        db.insert_data(self.connect, tmp)
+                    else:
+                        continue
             else:
-                pass
-        else:
-            print 'Insert Error'
+                print "ERROR TYPE"

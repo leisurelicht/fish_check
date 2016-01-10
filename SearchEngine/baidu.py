@@ -85,11 +85,20 @@ class BaiduSearch(baseclass.base):
                             url_and_title.append(url_and_title_temp.copy())
                             url_and_title_temp.clear()
                         else:
-                            print "无法获取当前URL的网页标题"
+                            tmp = {'URL':connect.url,'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                            self.into_database(tmp)
+                            # print "无法获取当前URL的网页标题"
+                            continue
                     else:
-                        print "无法格式化页面"
+                        tmp = {'URL':connect.url,'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                        self.into_database(tmp)
+                        # print "无法格式化页面"
+                        continue
                 else:
-                    print '无法连接'
+                    tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}
+                    self.into_database(tmp)
+                    # print '无法连接'
+                    continue
         return url_and_title
 
     def title_compare(self, total_url_and_title):
