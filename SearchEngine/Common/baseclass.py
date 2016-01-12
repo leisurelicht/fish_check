@@ -1,14 +1,36 @@
 #! /usr/bin/env python
 # -*- coding=utf-8 -*-
 
-from Common import database as db
+import os
+import database as db
+import function as fun
+
 
 class base(object):
     """
 
     """
-    def __init__(self,):
+    def __init__(self,configSection):
         super(base, self).__init__()
+        path = os.getcwd()
+        sub = path.find('fish_check')
+        path = path[sub:]
+        name = path.split('/')
+        if len(name) == 1:
+            self.configFile = './fishconfig.ini'
+        elif len(name) == 2:
+            self.configFile = '../fishconfig.ini'
+        elif len(name) == 3:
+            self.configFile = '../../fishconfig.ini'
+        else:
+            self.configFile = None
+
+        self.white_Domain = fun.read_config(self.configFile, configSection, 'White_Domain').split(',')
+        #self.pageNum = int(fun.read_config(self.configFile, configSection, 'Page_Num'))
+        self.pageNum = 1
+        self.Search_KeyWord = fun.read_config(self.configFile, configSection, 'Search_KeyWord').split(',')
+        self.Compare_KeyWord = fun.read_config(self.configFile, configSection, 'Compare_Title')
+
         self.connect = None
 
 
@@ -35,3 +57,14 @@ class base(object):
                         continue
             else:
                 print "ERROR TYPE"
+
+    def clear_database(self):
+        """
+        清空数据库
+        :return:
+        """
+        db.remove_date(self.connect)
+
+
+if __name__ == "__main__":
+    base = base()

@@ -8,6 +8,17 @@ from tld import get_tld
 from ConfigParser import ConfigParser
 
 
+def read_all_section(ini_file):
+    """
+    读取配置文件中的所有section
+    :param ini_file:
+    :return:
+    """
+    config = ConfigParser()
+    config.read(ini_file)
+    return config.sections()
+
+
 # 配置读取函数
 def read_config(ini_file, section, option):
     """
@@ -116,4 +127,4 @@ def exception_format(function_name, e):
 
 if __name__ == "__main__":
     url_compare('http://www.bankofshanghai.com',
-                'https://ibank.bankofshanghai.com/eweb/vx_zh_CN/login.html?LoginType=R&_locale=zh_CN')
+                 'https://ibank.bankofshanghai.com/eweb/vx_zh_CN/login.html?LoginType=R&_locale=zh_CN')

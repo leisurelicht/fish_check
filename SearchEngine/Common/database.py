@@ -20,7 +20,7 @@ def connect_bing():
 
 
 def connect_baidu():
-    print 'connect_bing'
+    print 'connect_baidu'
     try:
         client = pymongo.MongoClient(host, port)
     except Exception as e:
@@ -33,6 +33,11 @@ def connect_baidu():
 
 
 def insert_data(collection, database):
+    """
+    向数据库中插入数据
+    :param collection: 数据库对象
+    :param database: 可以是json格式或者dict格式的数据
+    """
     print 'insert_data'
     try:
         if isinstance(database, list):
@@ -49,9 +54,8 @@ def is_url_exist(collection, url):
     判断一个URL是否已经被存入数据库中
     存在 返回True
     不存在 返回False
-    :param collection:
-    :param url:
-    :return:
+    :param collection: 数据库实例对象
+    :param url: url
     """
     print 'search_url'
     try:

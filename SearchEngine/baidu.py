@@ -16,8 +16,8 @@ sys.setdefaultencoding('utf8')
 
 class BaiduSearch(baseclass.base):
     """docstring for baidu_search"""
-    def __init__(self,):
-        super(BaiduSearch, self).__init__()
+    def __init__(self,configSection):
+        super(BaiduSearch, self).__init__(configSection)
         # self.configFile = config_file
         # self.white_Domain = fun.read_config(self.configFile, 'Baidu-Search', 'White_Domain').split(',')
         # self.pageNum = int(fun.read_config(self.configFile, 'Baidu-Search', 'Page_Num'))
@@ -48,21 +48,22 @@ class BaiduSearch(baseclass.base):
                 urls.append(searchTarget.replace('#', str((num-1)*10)))
             for url in urls:
                 connect, page = net.data_soup(url, self.header)
-                sites = page.find_all('div', id=re.compile("^\d+$"))
-                for site in sites:
-                    if site:
-                        if site.h3:
-                            if site.h3.a:
-                                title_url[site.h3.a.get_text()] = site.h3.a.get('href')
-                                id_title_url[id_sign] = title_url.copy()
-                                id_sign += 1
-                                title_url.clear()
+                if page:
+                    sites = page.find_all('div', id=re.compile("^\d+$"))
+                    for site in sites:
+                        if site:
+                            if site.h3:
+                                if site.h3.a:
+                                    title_url[site.h3.a.get_text()] = site.h3.a.get('href')
+                                    id_title_url[id_sign] = title_url.copy()
+                                    id_sign += 1
+                                    title_url.clear()
+                                else:
+                                    continue
                             else:
                                 continue
                         else:
                             continue
-                    else:
-                        continue
             urls = []
         return id_title_url
 
@@ -96,7 +97,7 @@ class BaiduSearch(baseclass.base):
                         continue
                 else:
                     tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}
-                    self.into_database(tmp)
+                    # self.into_database(tmp)
                     # print '无法连接'
                     continue
         return url_and_title

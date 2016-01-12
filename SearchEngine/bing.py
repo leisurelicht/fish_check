@@ -14,8 +14,8 @@ sys.setdefaultencoding('utf8')
 
 class BingSearch(baseclass.base):
     """docstring for Bing_Search"""
-    def __init__(self, config_file):
-        super(BingSearch, self).__init__()
+    def __init__(self, configSection):
+        super(BingSearch, self).__init__(configSection)
         # self.configFile = config_file
         # self.white_Domain = fun.read_config(self.configFile, 'Bing-Search', 'White_Domain').split(',')
         # self.pageNum = int(fun.read_config(self.configFile, 'Bing-Search', 'Page_Num'))
@@ -93,7 +93,7 @@ class BingSearch(baseclass.base):
                         continue
                 else:
                     tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}
-                    self.into_database(tmp)
+                    # self.into_database(tmp)
                     continue
         return url_and_title
 

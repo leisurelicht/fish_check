@@ -9,7 +9,6 @@ from bs4 import BeautifulSoup
 import function as fun
 
 
-# 页面读取函数,その１
 def data_request(url, header):
     """
     获取网页后不处理
@@ -82,7 +81,6 @@ def data_request(url, header):
                     continue
 
 
-# 页面读取函数、その２
 def data_soup(url, header):
     """
     获取网页后用BeautifulSoup处理
@@ -106,7 +104,7 @@ def data_soup(url, header):
         print error_text
         return connect, None
     else:
-        #print 'soup:'+soup.original_encoding
+        # print 'soup:'+soup.original_encoding
         return connect, soup
 
 if __name__ == "__main__":
