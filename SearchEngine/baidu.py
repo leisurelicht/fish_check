@@ -16,18 +16,18 @@ sys.setdefaultencoding('utf8')
 
 class BaiduSearch(baseclass.base):
     """docstring for baidu_search"""
-    def __init__(self,config_file):
+    def __init__(self,):
         super(BaiduSearch, self).__init__()
-        self.configFile = config_file
-        self.white_Domain = fun.read_config(self.configFile, 'Baidu-Search', 'White_Domain').split(',')
-        self.pageNum = int(fun.read_config(self.configFile, 'Baidu-Search', 'Page_Num'))
-        self.Search_KeyWord = fun.read_config(self.configFile, 'Baidu-Search', 'Search_KeyWord').split(',')
-        self.Compare_KeyWord = fun.read_config(self.configFile, 'Baidu-Search', 'Compare_Title')
+        # self.configFile = config_file
+        # self.white_Domain = fun.read_config(self.configFile, 'Baidu-Search', 'White_Domain').split(',')
+        # self.pageNum = int(fun.read_config(self.configFile, 'Baidu-Search', 'Page_Num'))
+        # self.Search_KeyWord = fun.read_config(self.configFile, 'Baidu-Search', 'Search_KeyWord').split(',')
+        # self.Compare_KeyWord = fun.read_config(self.configFile, 'Baidu-Search', 'Compare_Title')
 
         self.searchUrl = 'http://www.baidu.com/s?wd=@&pn=#&cl=3&ie=utf-8&nojc=1'
-        self.searchTargetlist = []
+        self.search_Target_list = []
         for keyword in self.Search_KeyWord:
-            self.searchTargetlist.append(self.searchUrl.replace('@', unicode(keyword, "utf-8")))
+            self.search_Target_list.append(self.searchUrl.replace('@', unicode(keyword, "utf-8")))
 
         self.header = config.header
         self.header['Referer'] = 'http://www.baidu.com'
@@ -43,7 +43,7 @@ class BaiduSearch(baseclass.base):
         title_url = {}
         id_title_url = {}
         id_sign = 1
-        for searchTarget in self.searchTargetlist:
+        for searchTarget in self.search_Target_list:
             for num in range(1, self.pageNum+1):
                 urls.append(searchTarget.replace('#', str((num-1)*10)))
             for url in urls:
@@ -85,12 +85,12 @@ class BaiduSearch(baseclass.base):
                             url_and_title.append(url_and_title_temp.copy())
                             url_and_title_temp.clear()
                         else:
-                            tmp = {'URL':connect.url,'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                            tmp = {'URL':connect.url, 'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
                             self.into_database(tmp)
                             # print "无法获取当前URL的网页标题"
                             continue
                     else:
-                        tmp = {'URL':connect.url,'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                        tmp = {'URL':connect.url, 'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
                         self.into_database(tmp)
                         # print "无法格式化页面"
                         continue
@@ -111,8 +111,8 @@ class BaiduSearch(baseclass.base):
         url_and_title = []
         for url_and_title_temp in total_url_and_title:
             if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
-                if self.Compare_KeyWord in url_and_title_temp['TITLE1'] or \
-                                self.Compare_KeyWord in url_and_title_temp['TITLE2']:
+                if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
+                                self.Compare_KeyWord == url_and_title_temp['TITLE2']:
                     url_and_title.append(url_and_title_temp.copy())
                 else:
                     continue
@@ -161,9 +161,16 @@ class BaiduSearch(baseclass.base):
 
 
 if __name__ == "__main__":
-    baidu = BaiduSearch('../fishconfig.ini')
+    baidu = BaiduSearch()
     tmp = baidu.page_get()
     tmp = baidu.title_get(tmp)
     tmp = baidu.title_compare(tmp)
     baidu.into_database(tmp)
+    #baidu.clear_database()
+
+
     # baidu.pageCompare()
+
+    # temp = []
+    # for i in range(10):
+    #     temp.append(BaiduSearch('../fishconfig.ini'))

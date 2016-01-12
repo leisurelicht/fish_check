@@ -16,11 +16,11 @@ class BingSearch(baseclass.base):
     """docstring for Bing_Search"""
     def __init__(self, config_file):
         super(BingSearch, self).__init__()
-        self.configFile = config_file
-        self.white_Domain = fun.read_config(self.configFile, 'Bing-Search', 'White_Domain').split(',')
-        self.pageNum = int(fun.read_config(self.configFile, 'Bing-Search', 'Page_Num'))
-        self.Search_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Search_KeyWord').split(',')
-        self.Compare_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Compare_Title')
+        # self.configFile = config_file
+        # self.white_Domain = fun.read_config(self.configFile, 'Bing-Search', 'White_Domain').split(',')
+        # self.pageNum = int(fun.read_config(self.configFile, 'Bing-Search', 'Page_Num'))
+        # self.Search_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Search_KeyWord').split(',')
+        # self.Compare_KeyWord = fun.read_config(self.configFile, 'Bing-Search', 'Compare_Title')
 
         self.searchUrl = 'http://cn.bing.com/search?q=@&go=提交&first=#'
         self.searchTarget_list = []
@@ -83,12 +83,12 @@ class BingSearch(baseclass.base):
                             url_and_title.append(url_and_title_temp.copy())
                             url_and_title_temp.clear()
                         else:
-                            tmp = {'URL':connect.url,'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                            tmp = {'URL':connect.url, 'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
                             self.into_database(tmp)
                             # print "无法获取当前URL的网页标题:"+url
                             continue
                     else:
-                        tmp = {'URL':connect.url,'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                        tmp = {'URL':connect.url, 'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
                         self.into_database(tmp)
                         continue
                 else:
@@ -105,8 +105,8 @@ class BingSearch(baseclass.base):
         url_and_title = []
         for url_and_title_temp in total_url_and_title:
             if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
-                if self.Compare_KeyWord in url_and_title_temp['TITLE1'] or \
-                                self.Compare_KeyWord in url_and_title_temp['TITLE2']:
+                if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
+                                self.Compare_KeyWord == url_and_title_temp['TITLE2']:
                     url_and_title.append(url_and_title_temp.copy())
             else:
                 continue
