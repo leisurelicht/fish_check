@@ -43,14 +43,16 @@ class base(object):
         print 'into_database'
         if ut:
             if isinstance(ut, str):
-                temp={'URL':ut}
+                temp={'URL':ut, 'READ':'NO'}
                 if not db.is_url_exist(self.connect, ut):
                     db.insert_data(self.connect, temp)
             elif isinstance(ut, dict):
+                ut['Read'] = 'NO'
                 if not db.is_url_exist(self.connect, ut['URL']):
                     db.insert_data(self.connect, ut)
             elif isinstance(ut, list):
                 for tmp in ut:
+                    tmp['Read'] = 'NO'
                     if not db.is_url_exist(self.connect, tmp['URL']):
                         db.insert_data(self.connect, tmp)
                     else:
