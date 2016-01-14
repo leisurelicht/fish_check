@@ -86,14 +86,16 @@ class BaiduSearch(baseclass.base):
                             url_and_title.append(url_and_title_temp.copy())
                             url_and_title_temp.clear()
                         else:
-                            tmp = {'URL':connect.url, 'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
-                            self.into_database(tmp)
-                            # print "无法获取当前URL的网页标题"
+                            if not self.jud_white(connect.url):
+                                tmp = {'URL':connect.url, 'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                                self.into_database(tmp)
+                                # print "无法获取当前URL的网页标题"
                             continue
                     else:
-                        tmp = {'URL':connect.url, 'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
-                        self.into_database(tmp)
-                        # print "无法格式化页面"
+                        if not self.jud_white(connect.url):
+                            tmp = {'URL':connect.url, 'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                            self.into_database(tmp)
+                            # print "无法格式化页面"
                         continue
                 else:
                     tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}

@@ -67,6 +67,12 @@ class base(object):
         """
         db.remove_date(self.connect)
 
+    def jud_white(self,url):
+        if fun.get_domain(url) in self.white_Domain:
+            return True
+        else:
+            return False
+
 
 if __name__ == "__main__":
     base = base()
