@@ -38,7 +38,7 @@ class BaiduSearch(baseclass.base):
         获取页面
         返回格式为{id:{title:url},}的数据
         """
-        print "page_get"
+        print "baidu_page_get"
         urls = []
         title_url = {}
         id_title_url = {}
@@ -54,6 +54,7 @@ class BaiduSearch(baseclass.base):
                         if site:
                             if site.h3:
                                 if site.h3.a:
+                                    # print site.h3.a.get_text()
                                     title_url[site.h3.a.get_text()] = site.h3.a.get('href')
                                     id_title_url[id_sign] = title_url.copy()
                                     id_sign += 1
@@ -64,6 +65,8 @@ class BaiduSearch(baseclass.base):
                                 continue
                         else:
                             continue
+                else:
+                    print 'Can not get baidu search result'
             urls = []
         return id_title_url
 
@@ -164,7 +167,7 @@ class BaiduSearch(baseclass.base):
 
 
 if __name__ == "__main__":
-    baidu = BaiduSearch()
+    baidu = BaiduSearch('Target2')
     tmp = baidu.page_get()
     tmp = baidu.title_get(tmp)
     tmp = baidu.title_compare(tmp)
