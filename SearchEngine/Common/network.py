@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import function as fun
 
 
-def data_request(url, header):
+def data_request(url, header=None, cert=None):
     """
     获取网页后不处理
     返回一个requests类型的连接
@@ -19,13 +19,15 @@ def data_request(url, header):
     """
     print 'data_request'
     flag = fun.ssl_judge(url)
+    print flag
     count = 0
     while True:
         try:
             page = requests.get(url,
                                 headers=header,
                                 timeout=10,
-                                verify=flag)
+                                verify=flag,
+                                cert = cert)
         except requests.exceptions.ConnectTimeout:
             print 'ConnectTimeout'
             if count > 1:
@@ -81,7 +83,7 @@ def data_request(url, header):
                     continue
 
 
-def data_soup(url, header):
+def data_soup(url, header=None, cert=None):
     """
     获取网页后用BeautifulSoup处理
     返回一个元组(request格式的对象,beautifulSoup格式的对象)
@@ -90,7 +92,7 @@ def data_soup(url, header):
     :param header:
     """
     print 'data_soup'
-    connect = data_request(url, header)
+    connect = data_request(url, header, cert)
     try:
         if connect:
             html = connect.content
