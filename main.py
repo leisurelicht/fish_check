@@ -25,9 +25,11 @@ if __name__ == "__main__":
         search_list.append(bing.BingSearch(i))
 
     while 1:
+        print "Program start..."
         for i in search_list:
             t = threading.Thread(target=start(i))
             t.start()
+        print "Program waiting..."
         time.sleep(3600)
 
 
