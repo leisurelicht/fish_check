@@ -27,7 +27,7 @@ class base(object):
 
         self.white_Domain = fun.read_config(self.configFile, configSection, 'White_Domain').split(',')
         #self.pageNum = int(fun.read_config(self.configFile, configSection, 'Page_Num'))
-        self.pageNum = int(fun.read_config(self.configFile, 'PageNum', 'PageNum').strip())
+        self.pageNum = int(fun.read_config(self.configFile, configSection, 'PageNum').strip())
         self.Search_KeyWord = fun.read_config(self.configFile, configSection, 'Search_KeyWord').split(',')
         self.Compare_KeyWord = fun.read_config(self.configFile, configSection, 'Compare_Title')
 

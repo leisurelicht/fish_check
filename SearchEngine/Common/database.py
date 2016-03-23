@@ -31,6 +31,18 @@ def connect_baidu():
         collection = db.baidu
         return collection
 
+def connect_sogou():
+    print "connect_sogou"
+    try:
+        client = pymongo.MongoClient(host, port)
+    except Exception as e:
+        error_text = fun.exception_format(fun.get_current_function_name(),e)
+        print error_text
+    else:
+        db = client.fish_check
+        collection = db.sogou
+        return collection
+
 
 def insert_data(collection, database):
     """

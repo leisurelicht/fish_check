@@ -73,6 +73,7 @@ class BaiduSearch(baseclass.base):
     def title_get(self, id_title_and_url):
         """
         :param id_title_and_url:
+        返回格式为{url:[title1,title2],url:[title1,title2]}的数据
         """
         print 'title_get'
         url_and_title = []
@@ -90,20 +91,20 @@ class BaiduSearch(baseclass.base):
                             url_and_title_temp.clear()
                         else:
                             if not self.jud_white(connect.url):
-                                tmp = {'URL':connect.url, 'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                                tmp = {'URL':connect.url, 'TYPE':'GET_ERROR', 'TITLE1':'无法获取当前URL的网页标题'}
                                 self.into_database(tmp)
-                                # print "无法获取当前URL的网页标题"
+                                #print "无法获取当前URL的网页标题"
                             continue
                     else:
                         if not self.jud_white(connect.url):
-                            tmp = {'URL':connect.url, 'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                            tmp = {'URL':connect.url, 'TYPE':'FORMAT_ERROR', 'TITLE1':'无法格式化页面'}
                             self.into_database(tmp)
                             # print "无法格式化页面"
                         continue
                 else:
-                    tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}
+                    tmp = {'URL':url, 'TYPE':'CONNECT_ERROR', 'TITLE1':'无法连接'}
                     # self.into_database(tmp)
-                    # print '无法连接'
+                    #print '无法连接'
                     continue
         return url_and_title
 
@@ -117,6 +118,8 @@ class BaiduSearch(baseclass.base):
         url_and_title = []
         for url_and_title_temp in total_url_and_title:
             if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
+                print "开始检查URL：", url_and_title_temp['URL']
+                print "URL标题为：", url_and_title_temp['TITLE1']
                 if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
                                 self.Compare_KeyWord == url_and_title_temp['TITLE2']:
                     url_and_title.append(url_and_title_temp.copy())
@@ -167,7 +170,7 @@ class BaiduSearch(baseclass.base):
 
 
 if __name__ == "__main__":
-    baidu = BaiduSearch('Target2')
+    baidu = BaiduSearch('Target5')
     tmp = baidu.page_get()
     tmp = baidu.title_get(tmp)
     tmp = baidu.title_compare(tmp)
