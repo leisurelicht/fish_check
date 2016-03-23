@@ -84,17 +84,17 @@ class BingSearch(baseclass.base):
                             url_and_title_temp.clear()
                         else:
                             if not self.jud_white(connect.url):
-                                tmp = {'URL':connect.url, 'TYPE':'GET_ER', 'TITLE1':'无法获取当前URL的网页标题'}
+                                tmp = {'URL':connect.url, 'TYPE':'GET_ERROR', 'TITLE1':'无法获取当前URL的网页标题'}
                                 self.into_database(tmp)
                                 # print "无法获取当前URL的网页标题:"+url
                             continue
                     else:
                         if not self.jud_white(connect.url):
-                            tmp = {'URL':connect.url, 'TYPE':'FT_ER', 'TITLE1':'无法格式化页面'}
+                            tmp = {'URL':connect.url, 'TYPE':'FORMT_ERROR', 'TITLE1':'无法格式化页面'}
                             self.into_database(tmp)
                         continue
                 else:
-                    tmp = {'URL':url, 'TYPE':'CON_ER', 'TITLE1':'无法连接'}
+                    tmp = {'URL':url, 'TYPE':'CONNECT_ERROR', 'TITLE1':'无法连接'}
                     # self.into_database(tmp)
                     continue
         return url_and_title
