@@ -6,6 +6,7 @@ import function as fun
 host = "localhost"
 port = 27017
 
+
 def connect_bing():
     print 'connect_bing'
     try:
@@ -31,16 +32,30 @@ def connect_baidu():
         collection = db.baidu
         return collection
 
+
 def connect_sogou():
     print "connect_sogou"
     try:
         client = pymongo.MongoClient(host, port)
     except Exception as e:
-        error_text = fun.exception_format(fun.get_current_function_name(),e)
+        error_text = fun.exception_format(fun.get_current_function_name(), e)
         print error_text
     else:
         db = client.fish_check
         collection = db.sogou
+        return collection
+
+
+def connect_so():
+    print "connect_360so"
+    try:
+        client = pymongo.MongoClient(host, port)
+    except Exception as e:
+        error_text = fun.exception_format(fun.get_current_function_name(), e)
+        print error_text
+    else:
+        db = client.fish_check
+        collection = db.so
         return collection
 
 
@@ -82,17 +97,14 @@ def is_url_exist(collection, url):
             return True
 
 
-
-
-
 def remove_date(collection):
     collection.remove()
 
 
 if __name__ == "__main__":
-    con = connect_bing()
+    con = connect_so()
     # con.remove()
     # for data in con.find():
     #    print data['title']
 
-    # insert_data(con, {"name":"freebuf"})
+    insert_data(con, {"name":"freebuf"})

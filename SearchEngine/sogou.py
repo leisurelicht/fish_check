@@ -25,10 +25,6 @@ class SogouSearch(baseclass.base):
             self.cert = '/home/licht/Code/fish_check/SearchEngine/Common/sogou'
             self.connect = db.connect_sogou()
 
-    def title_and_url(self,tag):
-        # return tag
-        return tag['class'] == 'vrTitle'
-
     def page_get(self):
         """
         get search page
@@ -57,7 +53,7 @@ class SogouSearch(baseclass.base):
                     print 'can not get sogou search result'
         return url_title
 
-    def title_get(self,url_title):
+    def title_get(self, url_title):
         '''
         :param url_title:
         :return: 返回格式为{url:[title1,title2],url:[title1,title2]}的数据
@@ -100,7 +96,7 @@ class SogouSearch(baseclass.base):
         """
 
         :param total_url_and_title:
-        :return:
+        :return: format data like [{url:xxx,title1:xxx,title2:xxx}]
         """
         print "title_compare"
         url_and_title = []

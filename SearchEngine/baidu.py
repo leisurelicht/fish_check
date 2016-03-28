@@ -16,7 +16,7 @@ sys.setdefaultencoding('utf8')
 
 class BaiduSearch(baseclass.base):
     """docstring for baidu_search"""
-    def __init__(self,configSection):
+    def __init__(self, configSection):
         super(BaiduSearch, self).__init__(configSection)
         # self.configFile = config_file
         # self.white_Domain = fun.read_config(self.configFile, 'Baidu-Search', 'White_Domain').split(',')
