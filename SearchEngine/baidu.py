@@ -108,24 +108,7 @@ class BaiduSearch(baseclass.base):
                     continue
         return url_and_title
 
-    def title_compare(self, total_url_and_title):
-        """
 
-        :param total_url_and_title:
-        :return: [{url:xxx,title1:xxx,title2:xxx}]
-        """
-        print 'title_compare'
-        url_and_title = []
-        for url_and_title_temp in total_url_and_title:
-            if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
-                print "开始检查URL：", url_and_title_temp['URL']
-                print "URL标题为：", url_and_title_temp['TITLE1']
-                if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
-                                self.Compare_KeyWord == url_and_title_temp['TITLE2']:
-                    url_and_title.append(url_and_title_temp.copy())
-                else:
-                    continue
-        return url_and_title
 
 
 
@@ -165,7 +148,7 @@ class BaiduSearch(baseclass.base):
             return True
         else:
             print '不相似'
-            return False
+            return Fal
 '''
 
 

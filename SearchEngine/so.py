@@ -87,26 +87,6 @@ class SoSearch(baseclass.base):
                 continue
         return url_and_title
 
-    def title_compare(self, total_url_and_title):
-        """
-
-        :param total_url_and_title:
-        :return: format data like [{url:xxx,title1:xxx,title2:xxx}]
-        """
-        print "title_compare"
-        url_and_title = []
-        for url_and_title_temp in total_url_and_title:
-            if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
-                # print 'Title1:', url_and_title_temp['TITLE1']
-                # print 'Title2:', url_and_title_temp['TITLE2']
-                # print 'Key:', self.Compare_KeyWord
-                if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
-                                self.Compare_KeyWord == url_and_title_temp['TITLE2']:
-                    url_and_title.append(url_and_title_temp.copy())
-            else:
-                continue
-        print url_and_title
-        return url_and_title
 
 if __name__ == "__main__":
     so = SoSearch('Target5')

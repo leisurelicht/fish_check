@@ -99,24 +99,11 @@ class BingSearch(baseclass.base):
                     continue
         return url_and_title
 
-    def title_compare(self, total_url_and_title):
-        """
-        :param total_url_and_title:
-        """
-        print 'title_compare'
-        url_and_title = []
-        for url_and_title_temp in total_url_and_title:
-            if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
-                if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
-                                self.Compare_KeyWord == url_and_title_temp['TITLE2']:
-                    url_and_title.append(url_and_title_temp.copy())
-            else:
-                continue
-        return url_and_title
+
 
 
 if __name__ == "__main__":
-    bing = BingSearch('../fishconfig.ini')
+    bing = BingSearch('Target5')
     tmp = bing.page_get()
     tmp = bing.title_get(tmp)
     tmp = bing.title_compare(tmp)

@@ -6,6 +6,7 @@ import threading
 import time
 from SearchEngine import baidu
 from SearchEngine import bing
+from SearchEngine import so
 from SearchEngine.Common import function as fun
 
 def start(ob):
@@ -23,6 +24,7 @@ if __name__ == "__main__":
     for i in sections:
         search_list.append(baidu.BaiduSearch(i))
         search_list.append(bing.BingSearch(i))
+        search_list.append(so.SoSearch(i))
 
     while 1:
         print "Program start..."

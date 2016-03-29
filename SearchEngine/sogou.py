@@ -92,22 +92,6 @@ class SogouSearch(baseclass.base):
                 continue
         return url_and_title
 
-    def title_compare(self, total_url_and_title):
-        """
-
-        :param total_url_and_title:
-        :return: format data like [{url:xxx,title1:xxx,title2:xxx}]
-        """
-        print "title_compare"
-        url_and_title = []
-        for url_and_title_temp in total_url_and_title:
-            if fun.get_domain(url_and_title_temp['URL']) not in self.white_Domain:
-                if self.Compare_KeyWord == url_and_title_temp['TITLE1'] or \
-                                self.Compare_KeyWord == url_and_title_temp['TITLE2']:
-                    url_and_title.append(url_and_title_temp.copy())
-            else:
-                continue
-        return url_and_title
 
 if __name__ == "__main__":
     sogou = SogouSearch('Target5')
